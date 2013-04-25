@@ -1,0 +1,8 @@
+*.[oa]
+*.exe
+*.dll
+*.zip
+*.7z
+*.so
+bin/*
+
