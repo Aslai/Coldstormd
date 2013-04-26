@@ -23,7 +23,7 @@
 	<vector>
 	<map>
 
-1366537638 
+1366925306 
 
 1366537637 source:c:\users\kaslai\coldstorm\coldstormdaemon\main.cpp
 	<stdarg.h>
@@ -100,6 +100,8 @@
 1366921149 source:/home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/ajaxlistener.cpp
 	"ajaxlistener.h"
 
+1366951026 ner.h"
+
 1366908725 /home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/ajaxlistener.h
 	<stdarg.h>
 	<stdlib.h>
@@ -129,6 +131,8 @@
 	"threading.h"
 	"network.h"
 
+1366951249 "
+
 1366822711 /home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/mystring.h
 	<string>
 	<vector>
@@ -151,14 +155,20 @@
 	<process.h>
 	<pthread.h>
 
+1366925306 >
+
 1366910474 source:/home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/http.cpp
 	"http.h"
 
 1366836638 source:/home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/mystring.cpp
 	"mystring.h"
 
+1366925306 h"
+
 1366821988 source:/home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/threading.cpp
 	"threading.h"
+
+1366925306 .h"
 
 1366920918 source:/home/kaslai/Desktop/CS/coldstorm/ColdstormDaemon/main.cpp
 	<stdarg.h>
@@ -286,6 +296,114 @@
 	"http.h"
 
 1366951249 source:c:\users\kaslai\coldstorm\coldstormd\main.cpp
+	<stdarg.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<time.h>
+	<windows.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<process.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<unistd.h>
+	<termios.h>
+	<pthread.h>
+	<errno.h>
+	<signal.h>
+	<string>
+	<vector>
+	<map>
+	"mystring.h"
+	"threading.h"
+	"ajaxlistener.h"
+	"network.h"
+
+1366987454 source:/home/kaslai/Codeblocks/coldstormd/Coldstormd/ajaxlistener.cpp
+	"ajaxlistener.h"
+
+1366908725 /home/kaslai/Codeblocks/coldstormd/Coldstormd/ajaxlistener.h
+	<stdarg.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<time.h>
+	<windows.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<process.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<unistd.h>
+	<termios.h>
+	<pthread.h>
+	<errno.h>
+	<signal.h>
+	<string>
+	<vector>
+	<map>
+	<deque>
+	"mystring.h"
+	"http.h"
+	"threading.h"
+	"network.h"
+
+1366822711 /home/kaslai/Codeblocks/coldstormd/Coldstormd/mystring.h
+	<string>
+	<vector>
+	<stdio.h>
+	<ctype.h>
+	<stdint.h>
+
+1366907830 /home/kaslai/Codeblocks/coldstormd/Coldstormd/http.h
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	"mystring.h"
+	"network.h"
+	<map>
+
+1366987454 /home/kaslai/Codeblocks/coldstormd/Coldstormd/network.h
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<windows.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<unistd.h>
+	<vector>
+
+1366832958 /home/kaslai/Codeblocks/coldstormd/Coldstormd/threading.h
+	<windows.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<process.h>
+	<pthread.h>
+
+1366987454 source:/home/kaslai/Codeblocks/coldstormd/Coldstormd/http.cpp
+	"http.h"
+
+1366836638 source:/home/kaslai/Codeblocks/coldstormd/Coldstormd/mystring.cpp
+	"mystring.h"
+
+1366987454 source:/home/kaslai/Codeblocks/coldstormd/Coldstormd/network.cpp
+	"network.h"
+
+1366821988 source:/home/kaslai/Codeblocks/coldstormd/Coldstormd/threading.cpp
+	"threading.h"
+
+1367009762 source:/home/kaslai/Codeblocks/coldstormd/Coldstormd/main.cpp
 	<stdarg.h>
 	<stdlib.h>
 	<stdio.h>

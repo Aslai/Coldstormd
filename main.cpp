@@ -207,7 +207,7 @@ struct connectiontcp : connection{
             DEBUG;
 
             SOCKET a = accept( sock, 0, 0 );
-            if( a >> 0 ){
+            if( a > 0 ){
                 connectiontcp* c = new connectiontcp();
                 c->callback = cb;
                 c->sock = a;
@@ -265,12 +265,38 @@ uint32_t readint( FILE* f ){
     return v;
 }
 
+int validatechannelname(String name){
+    if( name.length() > 20 ) return 0;
+    if( name[0] != '#' ) return 0;
+    if( (signed)(name.find_first_of(" \t\r\n")) >= 0 ) return 0;
+    return 1;
+}
+
+int validateusername(String name){
+    DEBUG;
+    if( name.length() > 20 ) return 0;
+    DEBUG;
+    if( (signed)(name.find_first_of(" \t\r\n")) >= 0 ) return 0;
+    DEBUG;
+    String beans = "1234567890`-_=|}]{[qwertyuiopasdfghjklzxcvbnm<>,.?/!^*()";
+    DEBUG;
+    for( unsigned int i = 0; i < name.length(); ++i ){
+        DEBUG;
+        if( (signed)(beans.find_first_of(tolower(name[i]))) < (signed)0 ) return 0;
+        DEBUG;
+    }
+    DEBUG;
+    return 1;
+}
+
+
 enum {
     ACCESS_NONE=0,
     ACCESS_VOP=1,
     ACCESS_HOP=2,
     ACCESS_AOP=4,
-    ACCESS_SOP=8
+    ACCESS_SOP=8,
+    ACCESS_BANNED=16
 };
 
 struct user{
@@ -285,8 +311,14 @@ struct user{
     int online;
     int linestyped;
     uint32_t registered;
-    vector<int> rooms;
+    vector<unsigned int> rooms;
     int id;
+    int joinroom(String room);
+
+    String getmask(){
+        return nick+"!"+color+country+"@"+ip;
+    }
+
     int write( FILE* f ){
         int len = name.write(0) + nick.write(0) + color.write(0) + country.write(0) + ip.write(0) +
             password.write(0) + writeint(0,access) + writeint(0, online) + writeint(0, id) + writeint(0,linestyped) + writeint(0,registered) + writeint( 0, rooms.size() );
@@ -331,6 +363,11 @@ struct room{
     vector<int> users;
     vector<int> accesslist;
     String motd;
+    int canjoin( int usr );
+    int adduser( int usr, int access = ACCESS_NONE );
+
+    void broadcast(String message);
+
     int write( FILE* f ){
         int len = name.write(0) + starowner.write(0) + motd.write(0);
         for( unsigned int i = 0; i < accesslist.size(); ++i ) len += writeint( 0, accesslist[i] );
@@ -345,16 +382,27 @@ struct room{
         return len + sizeof(len);
     }
     int read( FILE* f ){
+        DEBUG;
         uint32_t len;
+        DEBUG;
         fread( &len, 1, 4, f );
+        DEBUG;
 
         name.read(f);
+        DEBUG;
         starowner.read(f);
+        DEBUG;
         motd.read(f);
+        DEBUG;
         uint32_t toread = readint( f );
+        DEBUG;
         for( unsigned int i = 0; i < toread; ++i ){
+            DEBUG;
             accesslist.push_back( readint( f ) );
+            DEBUG;
+
         }
+        DEBUG;
         return len + sizeof(len);
     }
 
@@ -366,6 +414,75 @@ struct room{
 vector<room> rooms;
 vector<user> users;
 vector<String> guestpasses;
+
+void room::broadcast(String message){
+    for( unsigned int i = 0; i < users.size(); ++i ){
+
+        ::users[users[i]].con->send(message);
+    }
+}
+int room::canjoin( int usr ){
+        for( unsigned int i = 0; i < users.size(); ++i ){
+
+            if( ::users[users[i]].id == usr ){
+                if( (accesslist[i] & ACCESS_BANNED) != 0 )
+                    return 0;
+                return 1;
+            }
+        }
+        return 1;
+    }
+int room::adduser( int usr, int access ){
+    if( !canjoin(usr) ) return 0;
+    users.push_back(usr);
+    accesslist.push_back(access);
+    broadcast(":"+::users[usr].getmask()+" JOIN "+name+"\r\n");
+    //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
+    return 1;
+}
+
+int user::joinroom(String room){
+    if( validatechannelname(room) == 0 ){
+        con->send( ":" + nick + "!user@user ERROR CHANNAME "+room+
+            " :Erroneous Channel Name :"+room+"\r\n");
+        return 0;
+    }
+    for( unsigned int i = 0; i < rooms.size();++i){
+        if( rooms[i] < ::rooms.size() ){
+            if( ::rooms[rooms[i]].name.tolower() == room.tolower() ){
+
+                con->send( ":" + nick + "!user@user ERROR PRESENT "+::rooms[rooms[i]].name+
+                         " :Cannot join "+::rooms[rooms[i]].name+" for you are already there\r\n");
+                return 0;
+            }
+        }
+        else break;
+    }
+
+    for( unsigned int i = 0; i < ::rooms.size();++i){
+        if( ::rooms[i].name.tolower() == room.tolower() ){
+            if( ::rooms[i].canjoin(id) ){
+                rooms.push_back( i );
+                //con->send( ":" + nick + "!user@user JOIN "+::rooms[i].name+"\r\n");
+                return ::rooms[i].adduser(id);
+            }
+            else {
+                con->send( ":" + nick + "!user@user ERROR BAN "+::rooms[i].name+
+                " :Cannot join "+::rooms[i].name+" for you are banned\r\n");
+                return -1;
+            }
+        }
+    }
+    struct room a;
+    a.motd = "";
+    //a.users.push_back( id );
+    //a.accesslist.push_back( ACCESS_SOP );
+    a.name = room;
+    a.starowner = "";
+    ::rooms.push_back( a );
+    rooms.push_back( ::rooms.size()-1 );
+    return ::rooms[::rooms.size()-1].adduser(id,ACCESS_SOP);
+}
 
 void writedb(String file){
     FILE* f = fopen( file.c_str(), "wb" );
@@ -399,23 +516,32 @@ void readdb( String file ){
     if( buf != "KASLAIDB" ){ printf("FAIL (%s): Expected a KASLAIDB file, got %s %i\n", file.c_str(), buf.c_str(), buf.size() ); return; }
     int ver = readint( f );
     if( ver != 100 ) { printf("FAIL (%s): Expected version %i, got %i\n", file.c_str(), 100, ver ); return; }
-
+DEBUG;
     uint32_t toread = readint( f );
-    for( unsigned int i = 0; i < toread; ++i ){
+    DEBUG;
+    for( unsigned int i = 0; i < toread; ){
+        DEBUG;
         room a;
-        a.read( f );
+        DEBUG;
+        i+=a.read( f );
+       DEBUG;
         rooms.push_back( a );
     }
-
+DEBUG;
     users.clear();
-
+DEBUG;
     toread = readint( f );
+    DEBUG;
     for( unsigned int i = 0; i < toread; ){
+        DEBUG;
         user a;
-
+DEBUG;
         i += a.read( f );
+        DEBUG;
         users.push_back( a );
+        DEBUG;
     }
+    DEBUG;
     fclose(f);
 
 }
@@ -452,7 +578,11 @@ int onmsgnewsession( connection& c, vector<String> args ){
             c.notice( "Usage: /VALIDATE name password" );
             return 0;
         }
-        user ops = getuserbyname( args[1] );
+        if( validateusername(args[1]) == 0){
+            c.notice( "Erroneous name" );
+            return 0;
+        }
+        user& ops = getuserbyname( args[1] );
         if( ops.id == 0 ){
             int v = consumeguestpass( args[2] );
             if( v == 0 ){
@@ -472,6 +602,14 @@ int onmsgnewsession( connection& c, vector<String> args ){
             ops.con = &c;
             c.usr = ops.id;
             c.send( ":"+c.ircname+"!user@user.user NICK "+ops.nick+"\r\n" );
+            for( unsigned int i = 0; i< ops.rooms.size(); ++i ){
+                if( ops.rooms[i] < rooms.size() ){
+                    switch( ::rooms[ops.rooms[i]].canjoin(ops.id) > 0 ){
+                        case 1: c.send( ":" + ops.nick + "!user@user JOIN "+rooms[ops.rooms[i]].name+"\r\n"); break;
+                        case 0: c.send( ":" + ops.nick + "!user@user ERROR BAN "+rooms[ops.rooms[i]].name+" :Cannot join "+rooms[ops.rooms[i]].name+" for you are banned\r\n"); break;
+                    }
+                }
+            }
             return 0;
         }
         else{
@@ -482,6 +620,62 @@ int onmsgnewsession( connection& c, vector<String> args ){
     else{
         c.notice( "Please use /VALIDATE [name] [password]" );
     }
+
+    return 0;
+}
+
+int onmsgguest( connection& c, vector<String> args ){
+    String chk = args[0].tolower();
+    if( chk == "setpass" ){
+        if( args.size() <= 1 ){
+            c.notice( "Usage: /SETPASS [password]" );
+            return 0;
+        }
+        user u;
+        u.access = ACCESS_NONE;
+        u.color = "FFFFFF";
+        u.country = getcountrycode( c.sock );
+        u.id = users.size();
+        u.ip = getipstr(c.sock);
+        u.name = c.name;
+        u.nick = c.name;
+        u.online = true;
+        u.password = args[1];
+        u.linestyped = 0;
+        u.registered = time(0);
+        u.con = &c;
+
+        c.usr = u.id;
+        c.state = LOGIN_FULL;
+        c.notice("You have set your password to " + args[1] +". Don't forget it!");
+        DEBUG;
+        c.send( ":"+c.ircname+"!user@user.user NICK "+u.nick+"\r\n" );
+        users.push_back( u );
+
+        DEBUG;
+        users[u.id].joinroom("#Coldstorm");
+        DEBUG;
+        users[u.id].joinroom("#2");
+        DEBUG;
+
+        DEBUG;
+
+    }
+    else{
+        c.notice("Please set your password before doing anything else with /SETPASS [password]");
+    }
+    return 0;
+}
+
+
+int onmsgfull( connection& c, vector<String> args ){
+    String chk = args[0].tolower();
+    if( chk == "join" ){
+        users[c.usr].joinroom(args[1]);
+    } else if( chk == "" ){
+
+    }
+    return 0;
 }
 
 
@@ -495,37 +689,13 @@ int callbacktcp( connection& c, String msg ){
     DEBUG;
     printf("LOGIN STATE: %i\n", c.state );
     if( c.state == LOGIN_NONE ){
-        onmsgnewsession( c, args );
+        return onmsgnewsession( c, args );
     }
     else if( c.state == LOGIN_GUEST ){
-        if( chk == "setpass" ){
-            if( args.size() <= 1 ){
-                c.notice( "Usage: /SETPASS [password]" );
-                return 0;
-            }
-            user u;
-            u.access = ACCESS_NONE;
-            u.color = "FFFFFF";
-            u.country = getcountrycode( c.sock );
-            u.id = users.size();
-            u.ip = getipstr(c.sock);
-            u.name = c.name;
-            u.nick = c.name;
-            u.online = true;
-            u.password = args[1];
-            u.linestyped = 0;
-            u.registered = time(0);
-            u.con = &c;
-            users.push_back( u );
-            c.usr = u.id;
-            c.state = LOGIN_FULL;
-            c.notice("You have set your password to " + args[1] +". Don't forget it!");
-            c.send( ":"+c.ircname+"!user@user.user NICK "+u.nick+"\r\n" );
-
-        }
-        else{
-            c.notice("Please set your password before doing anything else with /SETPASS [password]");
-        }
+        return onmsgguest( c, args );
+    }
+    else if( c.state == LOGIN_FULL ){
+        return onmsgfull( c, args );
     }
 
     return 0;
@@ -569,7 +739,7 @@ int main(){
 
     DEBUG;
     atexit( onquit );
-    //atexit(  );
+    atexit( socketcleanup );
 
     DEBUG;
 
@@ -591,6 +761,7 @@ int main(){
 
     DEBUG;
     socketcleanup();
+    exit(0);
     return 0;
     /*while( true ){
         Sleep(500);
