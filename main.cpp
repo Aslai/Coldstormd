@@ -37,6 +37,13 @@
 
 using namespace std;
 
+enum {
+    LOGIN_NONE=0,
+    LOGIN_GUEST,
+    LOGIN_FULL
+};
+
+
 
 String getipstr(SOCKET sock){
     //TODO: Implement
@@ -81,7 +88,7 @@ struct connectionajax : connection{
         sock = -1;
         validated = false;
         token = "";
-        state = 0;
+        state = LOGIN_NONE;
     }
     int send( String data ){
         mutex_lock(locked);
@@ -94,35 +101,65 @@ struct connectionajax : connection{
         connectionajax* self = (connectionajax*) d;
         String rbuf = "";
         ajaxlistener* p = c.parent;
-        String cook = c.cookie;
+        String cook = c.cookie.c_str();
+        printf("%s", cook.c_str() );
         while(true){
+                DEBUG;
             if( p->isvalid(cook) ){
-                //c.lock();
+                DEBUG;
+                printf("%s", cook.c_str() );
+        DEBUG;
+                c.lock();
+                DEBUG;
                 String a = c.recv(false);
+                DEBUG;
                 if( !p->isvalid(cook) ) break;
+                DEBUG;
                 if( a != "" ){
+                        DEBUG;
                     rbuf += a;
+                        DEBUG;
                     printf(" A: %s ", a.c_str() ); fflush(stdout);
+                        DEBUG;
                     vector<String> lines = rbuf.split("\r\n");
+                        DEBUG;
                     for( unsigned int i = 0; i < lines.size()-1; ++i ){
                         self->callback( *self, lines[i] );
+                        DEBUG;
                     }
                     rbuf = lines[lines.size() - 1];
+                        DEBUG;
 
 
                 }
+                        DEBUG;
+                printf("T");
+                        DEBUG;
                 if( self->sendbuf.size() > 0 ){
+                        DEBUG;
+                        printf("B");
+                        DEBUG;
                     mutex_lock(self->locked);
+                    DEBUG;
                     c.send( self->sendbuf );
+                    DEBUG;
+                    if( !p->isvalid(cook) ) break;
+                    DEBUG;
                     self->sendbuf = "";
+                    DEBUG;
                     mutex_unlock(self->locked);
+                    DEBUG;
                 }
-                //c.unlock();
+                DEBUG;
+                c.unlock();
+                DEBUG;
             }
             else break;
+            DEBUG;
             Sleep(50);
 
         }
+        DEBUG;
         return 1;
     }
     void listen( int port, int (*cb)( connection& c, String msg ) ){
@@ -155,7 +192,7 @@ struct connectiontcp : connection{
     }
 
     int isvalid(){
-        if( sock < 0 ) return false;
+        if( sock == 0 ) return false;
         return true;
     }
     void listen( int port, int (*cb)( connection& c, String msg ) ){
@@ -332,7 +369,7 @@ vector<String> guestpasses;
 
 void writedb(String file){
     FILE* f = fopen( file.c_str(), "wb" );
-    if( f <= 0 ) return;
+    if( f == 0 ) return;
     fputs( "KASLAIDB", f );
     uint32_t version = 100;
     fwrite( &version, 1, sizeof(version), f );
@@ -351,7 +388,7 @@ void writedb(String file){
 
 void readdb( String file ){
     FILE* f = fopen( file.c_str(), "rb" );
-    if( f <= 0 ) { printf("FAIL (%s): Unable to obtain read access\n", file.c_str() ); return; }
+    if( f == 0 ) { printf("FAIL (%s): Unable to obtain read access\n", file.c_str() ); return; }
     rooms.clear();
     String buf;
     char buf2[10];
@@ -405,12 +442,6 @@ int consumeguestpass( String pass ){
 }
 
 
-enum {
-    LOGIN_NONE=0,
-    LOGIN_GUEST,
-    LOGIN_FULL
-};
-
 
 
 int callbacktcp( connection& c, String msg ){
@@ -421,6 +452,7 @@ int callbacktcp( connection& c, String msg ){
     String chk = args[0].tolower();
 
     DEBUG;
+    printf("LOGIN STATE: %i\n", c.state );
     if( c.state == LOGIN_NONE ){
         if( chk == "nick" ){
             c.ircname = args[1];

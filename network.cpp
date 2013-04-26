@@ -5,7 +5,7 @@ static std::vector<SOCKET> bound;
 SOCKET bindSocket( int port )
 {
         SOCKET m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-        if (m_socket < 0) {return 0;}
+        if (m_socket == 0) {return 0;}
         sockaddr_in service;
 
         service.sin_family = AF_INET;
@@ -15,8 +15,8 @@ SOCKET bindSocket( int port )
             //closesocket(m_socket);
             return 0;
         }
-        if( m_socket > 0 )
-            bound.push_back( m_socket );
+        //if( m_socket > 0 )
+            //bound.push_back( m_socket );
         return m_socket;
 }
 

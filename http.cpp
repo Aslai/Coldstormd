@@ -75,7 +75,7 @@ int sendhttp( SOCKET sock, int status, String contenttype, String value ){
 
 int servefile( SOCKET sock, String name, int status, String contenttype ){
     FILE* f = fopen( name.c_str(), "rb" );
-    if( f <= 0 ){
+    if( f == 0 ){
         sendhttp( sock, 404, "text/html", "<h1>404: File not found</h1>" );
         return 0;
     }

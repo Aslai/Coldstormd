@@ -37,6 +37,8 @@ void ajaxlistener::runcallback(void* sel){
     //String cook = self->con->cookie;
     self->self->callback( *(self->con), self->data );
     //self->self->remove(cook);
+    self->self->connections[self->con->cookie] = 0;
+    delete self->con;
     delete self;
 }
 void ajaxlistener::docallback( ajaxconnection* c, void* d ){
@@ -83,7 +85,8 @@ int ajaxlistener::remove(String cookie){
     int ret = 0;
     ajaxconnection* c = connections[cookie];
     if( c != 0 ){
-        delete c;
+        //delete c;
+        connections[cookie]=0;
         ret = 1;
     }
     return ret;
@@ -171,7 +174,7 @@ int ajaxlistener::listen( int port, int (*cb)(ajaxconnection&,void*), void* user
     callback = cb;
     while( true ){
         SOCKET acceptsock = accept( sock, 0, 0 );
-        if( acceptsock < 0 ) {fprintf(stderr, "Error reading from AJAX Socket %i\n", port); break;}
+        if( acceptsock == 0 ) {fprintf(stderr, "Error reading from AJAX Socket %i\n", port); break;}
         String a = readsock( acceptsock );
 
         http h = parsehttp( a );
@@ -232,7 +235,7 @@ int ajaxlistener::listen( int port, int (*cb)(ajaxconnection&,void*), void* user
 int ajaxlistener::ajaxconnection::updatetime(int val){
     if( val > 0 )
         timesincelast = time(0);
-    if( (int)(time(0) - timesincelast) > timeout )
+    if( ((signed int)time(0) - (signed int)timesincelast) > (signed int)timeout )
         close();
         printf("Diff: %i\n", (int)(time(0) - timesincelast)); fflush(stdout);
     return val;
@@ -240,13 +243,15 @@ int ajaxlistener::ajaxconnection::updatetime(int val){
 
 ajaxlistener::ajaxconnection::~ajaxconnection(){
     lock();
+    parent->connections[cookie] = 0;
     if( polling != 0 ){
         sendhttp( polling, 404, "text/html", "Connection Closed" );
-        parent->connections[cookie] = 0;
+
     }
     sendqueue = "";
     while( dataqueue.size() > 0 ) { dataqueue.back() = ""; dataqueue.pop_back(); }
     cookie = "";
+
 
     unlock();
 }
