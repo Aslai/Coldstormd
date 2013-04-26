@@ -1,0 +1,6 @@
+<script type="text/javascript">
+xmlhttp=new XMLHttpRequest();
+xmlhttp.onreadystatechange=function(){console.log("Value: "+xmlhttp.responseText);}
+xmlhttp.open("GET","http://localhost:81/ajax.php?session=new",true);
+xmlhttp.send();
+</script>

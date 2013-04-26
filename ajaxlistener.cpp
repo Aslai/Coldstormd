@@ -183,13 +183,14 @@ int ajaxlistener::listen( int port, int (*cb)(ajaxconnection&,void*), void* user
                 ajaxconnection* c = new ajaxconnection();
                 c->ip = getip(acceptsock);
                 c->cookie = generatecookie(acceptsock);
+                c->parent = this;
 
                 if( connections[c->cookie] != 0 ){
                     delete c;
                     sendhttp( acceptsock, 404, "text/html", "error" );
                     continue;
                 }
-                c->parent = this;
+
                 c->state = 200;
                 c->polling = 0;
                 c->timesincelast = time(0);
@@ -224,6 +225,7 @@ int ajaxlistener::listen( int port, int (*cb)(ajaxconnection&,void*), void* user
             }
         }
         if( h.path == "/index.html" || h.path == "/" ){
+            printf("lol");
             servefile( acceptsock, "index.html" );
         }
         //h.urldata

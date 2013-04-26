@@ -442,6 +442,47 @@ int consumeguestpass( String pass ){
 }
 
 
+int onmsgnewsession( connection& c, vector<String> args ){
+    String chk = args[0].tolower();
+    if( chk == "nick" ){
+        c.ircname = args[1];
+    }
+    if( chk == "validate"){
+        if( args.size() <= 2 ){
+            c.notice( "Usage: /VALIDATE name password" );
+            return 0;
+        }
+        user ops = getuserbyname( args[1] );
+        if( ops.id == 0 ){
+            int v = consumeguestpass( args[2] );
+            if( v == 0 ){
+                c.notice( "That is an invalid username/password combo" );
+                return 0;
+            }
+            c.state = LOGIN_GUEST;
+            c.notice( "Welcome to Coldstorm, "+args[1]+". Please set your password with /SETPASS [password]" );
+            c.name = args[1];
+            return 0;
+        }
+        if( ops.password == args[2] ){
+            c.state = LOGIN_FULL;
+            c.notice( "Successfully logged in as "+args[1] );
+            ops.country = getcountrycode( c.sock );
+            ops.ip = getipstr( c.sock );
+            ops.con = &c;
+            c.usr = ops.id;
+            c.send( ":"+c.ircname+"!user@user.user NICK "+ops.nick+"\r\n" );
+            return 0;
+        }
+        else{
+            c.notice( "That is an invalid username/password combo" );
+            return 0;
+        }
+    }
+    else{
+        c.notice( "Please use /VALIDATE [name] [password]" );
+    }
+}
 
 
 int callbacktcp( connection& c, String msg ){
@@ -454,44 +495,7 @@ int callbacktcp( connection& c, String msg ){
     DEBUG;
     printf("LOGIN STATE: %i\n", c.state );
     if( c.state == LOGIN_NONE ){
-        if( chk == "nick" ){
-            c.ircname = args[1];
-        }
-        if( chk == "validate"){
-            if( args.size() <= 2 ){
-                c.notice( "Usage: /VALIDATE name password" );
-                return 0;
-            }
-            user ops = getuserbyname( args[1] );
-            if( ops.id == 0 ){
-                int v = consumeguestpass( args[2] );
-                if( v == 0 ){
-                    c.notice( "That is an invalid username/password combo" );
-                    return 0;
-                }
-                c.state = LOGIN_GUEST;
-                c.notice( "Welcome to Coldstorm, "+args[1]+". Please set your password with /SETPASS [password]" );
-                c.name = args[1];
-                return 0;
-            }
-            if( ops.password == args[2] ){
-                c.state = LOGIN_FULL;
-                c.notice( "Successfully logged in as "+args[1] );
-                ops.country = getcountrycode( c.sock );
-                ops.ip = getipstr( c.sock );
-                ops.con = &c;
-                c.usr = ops.id;
-                c.send( ":"+c.ircname+"!user@user.user NICK "+ops.nick+"\r\n" );
-                return 0;
-            }
-            else{
-                c.notice( "That is an invalid username/password combo" );
-                return 0;
-            }
-        }
-        else{
-            c.notice( "Please use /VALIDATE [name] [password]" );
-        }
+        onmsgnewsession( c, args );
     }
     else if( c.state == LOGIN_GUEST ){
         if( chk == "setpass" ){
@@ -538,7 +542,7 @@ void listenforajax(void*){
 
     DEBUG;
     connectionajax con;
-    con.listen(6666, callbacktcp);
+    con.listen(81, callbacktcp);
 }
 
 void onquit(void){
