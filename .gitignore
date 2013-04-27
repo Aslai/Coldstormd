@@ -5,4 +5,6 @@
 *.7z
 *.so
 bin/*
-
+*.kdb
+*.layout
+*.depend
