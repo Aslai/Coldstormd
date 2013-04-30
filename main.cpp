@@ -314,6 +314,8 @@ struct user{
     vector<unsigned int> rooms;
     int id;
     int joinroom(String room);
+        int privmsg( int usr, String msg );
+    int notice( int usr, String msg );
 
     String getmask(){
         return nick+"!"+color+country+"@"+ip;
@@ -362,9 +364,15 @@ struct room{
     String starowner;
     vector<int> users;
     vector<int> accesslist;
+    vector<int> usershave;
     String motd;
     int canjoin( int usr );
     int adduser( int usr, int access = ACCESS_NONE );
+    int partuser( int usr );
+    int removeuser( int usr );
+    int privmsg( int usr, String msg );
+    int notice( int usr, String msg );
+
 
     void broadcast(String message);
 
@@ -415,6 +423,7 @@ vector<room> rooms;
 vector<user> users;
 vector<String> guestpasses;
 
+
 void room::broadcast(String message){
     for( unsigned int i = 0; i < users.size(); ++i ){
 
@@ -434,12 +443,63 @@ int room::canjoin( int usr ){
     }
 int room::adduser( int usr, int access ){
     if( !canjoin(usr) ) return 0;
+    for( unsigned int i = 0; i < users.size(); ++i ){
+        if( ::users[users[i]].id == usr ){
+            return 0;
+        }
+    }
+    for( unsigned int i = 0; i < usershave.size(); ++i ){
+        if( ::users[usershave[i]].id == usr ){
+            return 0;
+        }
+    }
+
     users.push_back(usr);
     accesslist.push_back(access);
+    usershave.push_back(usr);
     broadcast(":"+::users[usr].getmask()+" JOIN "+name+"\r\n");
     //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
     return 1;
 }
+int room::partuser(int usr){
+    for( unsigned int i = 0; i < usershave.size(); ++i ){
+        if( usershave[i] == usr ){
+            broadcast(":" + ::users[usr].getmask() + " PART "+name+"\r\n");
+            usershave.erase( usershave.begin() + i );
+            return 1;
+        }
+    }
+    return 0;
+}
+int room::removeuser(int usr){
+    partuser(usr);
+    for( int i = 0; i < users[i]; ++i ){
+        if( users[i] == usr ){
+            users.erase( users.begin() + i );
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int room::privmsg( int usr, String msg ){
+    broadcast(":"+::users[usr].getmask()+" PRIVMSG "+name+" :" + msg );
+    return 1;
+}
+int room::notice( int usr, String msg ){
+    broadcast(":"+::users[usr].getmask()+" NOTICE "+name+" :" + msg );
+    return 1;
+}
+int user::privmsg( int usr, String msg ){
+    con->send(":"+::users[usr].getmask()+" PRIVMSG "+nick+" :" + msg );
+    return 1;
+}
+int user::notice( int usr, String msg ){
+    con->send(":"+::users[usr].getmask()+" NOTICE "+nick+" :" + msg );
+    return 1;
+}
+
+
 
 int user::joinroom(String room){
     if( validatechannelname(room) == 0 ){
@@ -547,7 +607,7 @@ DEBUG;
 }
 
 
-user& getuserbyname(String name){
+/*user& getuserbyname(String name){
     name = name.tolower();
     for( unsigned int i = 1; i < users.size(); ++i ){
         if( name == users[i].name.tolower() ){
@@ -555,6 +615,23 @@ user& getuserbyname(String name){
         }
     }
     return users[0];
+}*/
+int getroombyname(String name){
+    for( unsigned int i = 0; i < rooms.size(); ++i ){
+        if( rooms[i].name.tolower() == name.tolower() ){
+            return i;
+        }
+    }
+    return -1;
+}
+
+int getuserbyname(String name){
+    for( unsigned int i = 0; i < users.size(); ++i ){
+        if( users[i].nick.tolower() == name.tolower() ){
+            return i;
+        }
+    }
+    return -1;
 }
 
 int consumeguestpass( String pass ){
@@ -582,7 +659,9 @@ int onmsgnewsession( connection& c, vector<String> args ){
             c.notice( "Erroneous name" );
             return 0;
         }
-        user& ops = getuserbyname( args[1] );
+        int us = getuserbyname( args[1] );
+
+        user& ops = users[us<0?0:us];
         if( ops.id == 0 ){
             int v = consumeguestpass( args[2] );
             if( v == 0 ){
@@ -668,13 +747,54 @@ int onmsgguest( connection& c, vector<String> args ){
 }
 
 
+
+
+int ping( int usr, String message ){
+    ::users[usr].con->send("PONG :"+message+"\r\n");
+    return 1;
+}
+int pong( int usr, String message ){
+    //::users[usr].con->send("PONG :"+message+"\r\n");
+    message[0]=message[0];
+    usr*=2;
+    return 1;
+}
+int privmsg( int usr, String target, String message ){
+    if( target[0] == '#' )
+    {
+        int t = getroombyname(target);
+        if( t >= 0 ){
+            return rooms[t].privmsg(usr, message);
+        }
+    }
+    else{
+        int t = getuserbyname(target);
+        if( t >= 0 ){
+            return users[t].privmsg(usr, message);
+        }
+    }
+    //::users[usr].con->send("PONG :"+message+"\r\n");
+    return 1;
+}
+
+
+
 int onmsgfull( connection& c, vector<String> args ){
     String chk = args[0].tolower();
     if( chk == "join" ){
         users[c.usr].joinroom(args[1]);
+    } else if( chk == "ping" ){
+        ping(c.usr, args[1] );
+    } else if( chk == "pong" ){
+        pong(c.usr, args[1] );
+    } else if( chk == "privmsg" ){
+        privmsg(c.usr, args[1], args[2] );
+    } else if( chk == "" ){
+
     } else if( chk == "" ){
 
     }
+
     return 0;
 }
 
@@ -718,6 +838,15 @@ void listenforajax(void*){
 void onquit(void){
     writedb( "database.kdb" );
 }
+
+/*int makeroom(String name){
+    struct room a;
+    a.motd = "";
+    a.name = room;
+    a.starowner = "";
+    ::rooms.push_back( a );
+    rooms.push_back( ::rooms.size()-1 );
+}*/
 
 int main(){
     #ifdef _WIN32

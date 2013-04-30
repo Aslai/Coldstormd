@@ -2,36 +2,36 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="DebugLinux" />
 	<File name="ajaxlistener.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="2184" topLine="93" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="ajaxlistener.h" open="1" top="0" tabpos="3">
-		<Cursor position="899" topLine="39" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="http.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="1204" topLine="26" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="http.h" open="1" top="0" tabpos="5">
-		<Cursor position="95" topLine="0" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="main.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="7649" topLine="629" />
+		<Cursor position="17562" topLine="649" />
 	</File>
 	<File name="mystring.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="2764" topLine="84" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="mystring.h" open="1" top="0" tabpos="6">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="network.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="895" topLine="7" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="network.h" open="1" top="0" tabpos="11">
-		<Cursor position="498" topLine="0" />
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="threading.cpp" open="1" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="threading.h" open="1" top="0" tabpos="7">
-		<Cursor position="12" topLine="0" />
+		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>
