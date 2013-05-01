@@ -63,6 +63,9 @@ String servername = "coldstorm.tk";
 
 struct connection{
     int (*callback)( connection& c, String msg );
+    int (*onconnect)( connection& c );
+    int (*onquit)( connection& c );
+
     bool validated;
     String token;
     int usr;
@@ -70,9 +73,10 @@ struct connection{
     String name;
     String ircname;
     SOCKET sock;
+    int introd;
 
     virtual int send( String data ) = 0;
-    virtual void listen( int port, int (*cb)( connection& c, String msg ) ) = 0;
+    virtual void listen( int port, int (*cb)( connection& c, String msg ), int (*oncon)( connection& c ), int (*onq)( connection& c ) ) = 0;
 
     void notice(String text){
         send( ":" + servername + " NOTICE USER :"+text+"\r\n" );
@@ -89,6 +93,9 @@ struct connectionajax : connection{
         validated = false;
         token = "";
         state = LOGIN_NONE;
+        introd = false;
+        onquit = 0;
+        onconnect = 0;
     }
     int send( String data ){
         mutex_lock(locked);
@@ -98,7 +105,10 @@ struct connectionajax : connection{
         return 1;
     }
     static int callme( ajaxlistener::ajaxconnection& c, void* d ){
+
         connectionajax* self = (connectionajax*) d;
+        if( self->onconnect != 0 )
+            self->onconnect(*self);
         String rbuf = "";
         ajaxlistener* p = c.parent;
         String cook = c.cookie.c_str();
@@ -160,11 +170,16 @@ struct connectionajax : connection{
 
         }
         DEBUG;
+        if( self->onquit != 0 )
+            self->onquit(*self);
         return 1;
     }
-    void listen( int port, int (*cb)( connection& c, String msg ) ){
+    void listen( int port, int (*cb)( connection& c, String msg )=0, int (*oncon)( connection& c )=0, int (*onq)( connection& c )=0  ){
         ajaxlistener con;
         callback = cb;
+        onconnect = oncon;
+        onquit = onq;
+
         con.listen( port, callme, (void*) this );
     }
 };
@@ -175,11 +190,15 @@ struct connectiontcp : connection{
         validated = false;
         token = "";
         state = 0;
+        introd = false;
+        onquit = 0;
+        onconnect = 0;
     }
     int send( String data ){
         char* tmp = (char*)data.c_str();
         unsigned int len = data.size();
         while( len > 0 ){
+            DEBUG;
             int diff = ::send( sock, tmp, len, MSG_NOSIGNAL );
             if( diff < 0 ){
                 sock = -1;
@@ -195,7 +214,7 @@ struct connectiontcp : connection{
         if( sock == 0 ) return false;
         return true;
     }
-    void listen( int port, int (*cb)( connection& c, String msg ) ){
+    void listen( int port, int (*cb)( connection& c, String msg )=0, int (*oncon)( connection& c )=0, int (*onq)( connection& c )=0  ){
         //blah
         DEBUG;
 
@@ -211,6 +230,9 @@ struct connectiontcp : connection{
                 connectiontcp* c = new connectiontcp();
                 c->callback = cb;
                 c->sock = a;
+                c->onconnect = oncon;
+                c->onquit = onq;
+
                 DEBUG;
                 call_thread( c->recvloop, (void*)c );
                 DEBUG;
@@ -224,14 +246,19 @@ struct connectiontcp : connection{
     static void recvloop( void* slf ){
         DEBUG;
 
+
         connectiontcp* self = (connectiontcp*) slf;
+        if( self->onconnect != 0 )
+            self->onconnect(*self);
         String buffer = "";
         self->notice("Please authenticate with /VALIDATE [name] [password]");
         while( true ){
+                DEBUG;
             char buf[1001];
             int len = recv( self->sock, buf, 1000, 0 );
             if( len < -0 ) break;
             for( int i = 0; i < len; ++i ){
+                DEBUG;
                 if( buf[i] == -0 ) buf[i] -= 1;
             }
             buf[len] = 0;
@@ -241,6 +268,7 @@ struct connectiontcp : connection{
             vector<String> lines = buffer.split("\r\n");
 
             for( unsigned int i = 0; i < lines.size(); ++i ){
+                    DEBUG;
                 if( lines[i] != "" )
                 self->callback( *self, lines[i] );
             }
@@ -248,6 +276,8 @@ struct connectiontcp : connection{
 
         }
         self->sock = -1;
+        if( self->onquit != 0 )
+            self->onquit(*self);
     }
 };
 
@@ -310,14 +340,20 @@ struct user{
     int access;
     int online;
     int linestyped;
+    int echo;
     uint32_t registered;
     vector<unsigned int> rooms;
     int id;
-    int joinroom(String room);
+    int joinroom(String room, bool overrideblocks=false);
         int privmsg( int usr, String msg );
     int notice( int usr, String msg );
 
     String getmask(){
+        printf("%s\n", nick.c_str() );
+        printf("%s\n", color.c_str() );
+        printf("%s\n", country.c_str() );
+        printf("%s\n", ip.c_str() );
+
         return nick+"!"+color+country+"@"+ip;
     }
 
@@ -353,7 +389,7 @@ struct user{
 
         uint32_t toread = readint( f );
         for( unsigned int i = 0; i < toread; ++i ){
-
+            DEBUG;
             rooms.push_back( readint( f ) );
         }
         return len + sizeof(len);
@@ -366,24 +402,30 @@ struct room{
     vector<int> accesslist;
     vector<int> usershave;
     String motd;
+    int motdsetby;
+    int motdseton;
     int canjoin( int usr );
     int adduser( int usr, int access = ACCESS_NONE );
     int partuser( int usr );
     int removeuser( int usr );
     int privmsg( int usr, String msg );
     int notice( int usr, String msg );
+    int sendinfo(int usr);
+    int sendwho(int usr);
 
 
-    void broadcast(String message);
+    void broadcast(int usr, String message, bool supressecho = true);
 
     int write( FILE* f ){
-        int len = name.write(0) + starowner.write(0) + motd.write(0);
+        int len = name.write(0) + starowner.write(0) + motd.write(0) + writeint(0, motdsetby) + writeint(0, motdseton) ;
         for( unsigned int i = 0; i < accesslist.size(); ++i ) len += writeint( 0, accesslist[i] );
         if( f != 0 ){
             fwrite(&len, 1, sizeof(uint32_t), f );
             name.write(f);
             starowner.write(f);
             motd.write(f);
+            writeint(f, motdsetby);
+            writeint(f, motdseton);
             writeint( f, accesslist.size() );
             for( unsigned int i = 0; i < accesslist.size(); ++i ) len += writeint( f, accesslist[i] );
         }
@@ -401,6 +443,9 @@ struct room{
         starowner.read(f);
         DEBUG;
         motd.read(f);
+        motdsetby = readint(f);
+        motdseton = readint(f);
+
         DEBUG;
         uint32_t toread = readint( f );
         DEBUG;
@@ -424,15 +469,18 @@ vector<user> users;
 vector<String> guestpasses;
 
 
-void room::broadcast(String message){
-    for( unsigned int i = 0; i < users.size(); ++i ){
-
-        ::users[users[i]].con->send(message);
+void room::broadcast(int usr, String message, bool supressecho){
+    printf("ba\n");
+    for( unsigned int i = 0; i < usershave.size(); ++i ){
+        if( supressecho )
+            if( usershave[i] == usr && ::users[usershave[i]].echo == false ) continue;
+        printf("Broadcast from %s to %s\n", name.c_str(), ::users[usershave[i]].nick.c_str() );
+        ::users[usershave[i]].con->send(message);
     }
 }
 int room::canjoin( int usr ){
         for( unsigned int i = 0; i < users.size(); ++i ){
-
+            DEBUG;
             if( ::users[users[i]].id == usr ){
                 if( (accesslist[i] & ACCESS_BANNED) != 0 )
                     return 0;
@@ -441,30 +489,94 @@ int room::canjoin( int usr ){
         }
         return 1;
     }
+
+String I(int in){
+    int l = snprintf(0, 0, "%i", in);
+    String ret;
+    ret.resize( l+1 );
+    snprintf((char*)ret.c_str(), l+1, "%i", in);
+    return ret;
+}
+
+int room::sendwho(int usr){
+    for( unsigned int i = 0; i < usershave.size(); ++i ){
+        String prep="";
+        for( unsigned int j = 0; j < users.size(); ++j ){
+            if( users[j] == usershave[i] ){
+                switch( accesslist[j] ){
+                    case ACCESS_VOP: prep = "+"; break;
+                    case ACCESS_HOP: prep = "#"; break;
+                    case ACCESS_AOP: prep = "@"; break;
+                    case ACCESS_SOP: prep = "~"; break;
+                }
+            }
+        }
+        ::users[usr].con->send(":"+servername+" 352 "+::users[usr].nick+" "+name
+                               +" "+::users[usr].color+" "+::users[usr].ip+" "+servername+" "
+                               +::users[usr].nick+" H"+prep+" "+::users[usr].name+"\r\n");
+    }
+    return 1;
+}
+
+int room::sendinfo(int usr){
+    ::users[usr].con->send(":"+servername+" 332 "+::users[usr].nick+" "+name+" :"+motd+"\r\n");
+    ::users[usr].con->send(":"+servername+" 333 "+::users[usr].nick+" "+name+" "+::users[motdsetby].getmask()+" "+I(motdseton)+"\r\n");
+    String s = ":"+servername+" 353 "+::users[usr].nick+" = "+name+" :";
+    for( unsigned int i = 0; i < usershave.size(); ++i ){
+        String prep="";
+        for( unsigned int j = 0; j < users.size(); ++j ){
+            if( users[j] == usershave[i] ){
+                switch( accesslist[j] ){
+                    case ACCESS_VOP: prep = "+"; break;
+                    case ACCESS_HOP: prep = "#"; break;
+                    case ACCESS_AOP: prep = "@"; break;
+                    case ACCESS_SOP: prep = "~"; break;
+                }
+            }
+        }
+        s += prep + ::users[usershave[i]].nick+" ";
+    }
+    ::users[usr].con->send(s+"\r\n");
+    sendwho(usr);
+    return 1;
+}
+
 int room::adduser( int usr, int access ){
     if( !canjoin(usr) ) return 0;
-    for( unsigned int i = 0; i < users.size(); ++i ){
-        if( ::users[users[i]].id == usr ){
+
+    for( unsigned int i = 0; i < usershave.size(); ++i ){
+            DEBUG;
+        if( ::users[usershave[i]].id == usr ){
             return 0;
         }
     }
-    for( unsigned int i = 0; i < usershave.size(); ++i ){
-        if( ::users[usershave[i]].id == usr ){
-            return 0;
+    for( unsigned int i = 0; i < users.size(); ++i ){
+        DEBUG;
+        if( ::users[users[i]].id == usr ){
+            usershave.push_back(usr);
+            DEBUG;
+
+
+            broadcast(usr, ":"+::users[usr].getmask()+" JOIN "+name+"\r\n", false);
+            sendinfo(usr);
+            return 1;
         }
     }
 
     users.push_back(usr);
     accesslist.push_back(access);
     usershave.push_back(usr);
-    broadcast(":"+::users[usr].getmask()+" JOIN "+name+"\r\n");
+    DEBUG;
+    broadcast(usr, ":"+::users[usr].getmask()+" JOIN "+name+"\r\n", false);
+    sendinfo(usr);
     //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
     return 1;
 }
 int room::partuser(int usr){
     for( unsigned int i = 0; i < usershave.size(); ++i ){
+            DEBUG;
         if( usershave[i] == usr ){
-            broadcast(":" + ::users[usr].getmask() + " PART "+name+"\r\n");
+            broadcast(usr, ":" + ::users[usr].getmask() + " PART "+name+"\r\n", false);
             usershave.erase( usershave.begin() + i );
             return 1;
         }
@@ -474,6 +586,7 @@ int room::partuser(int usr){
 int room::removeuser(int usr){
     partuser(usr);
     for( int i = 0; i < users[i]; ++i ){
+            DEBUG;
         if( users[i] == usr ){
             users.erase( users.begin() + i );
             return 1;
@@ -483,43 +596,66 @@ int room::removeuser(int usr){
 }
 
 int room::privmsg( int usr, String msg ){
-    broadcast(":"+::users[usr].getmask()+" PRIVMSG "+name+" :" + msg );
+    broadcast(usr, ":"+::users[usr].getmask()+" PRIVMSG "+name+" :" + msg+"\r\n" );
     return 1;
 }
 int room::notice( int usr, String msg ){
-    broadcast(":"+::users[usr].getmask()+" NOTICE "+name+" :" + msg );
+    broadcast(usr, ":"+::users[usr].getmask()+" NOTICE "+name+" :" + msg+"\r\n" );
     return 1;
 }
 int user::privmsg( int usr, String msg ){
-    con->send(":"+::users[usr].getmask()+" PRIVMSG "+nick+" :" + msg );
+    con->send(":"+::users[usr].getmask()+" PRIVMSG "+nick+" :" + msg+"\r\n" );
     return 1;
 }
 int user::notice( int usr, String msg ){
-    con->send(":"+::users[usr].getmask()+" NOTICE "+nick+" :" + msg );
+    con->send(":"+::users[usr].getmask()+" NOTICE "+nick+" :" + msg+"\r\n" );
     return 1;
 }
 
 
 
-int user::joinroom(String room){
-    if( validatechannelname(room) == 0 ){
-        con->send( ":" + nick + "!user@user ERROR CHANNAME "+room+
-            " :Erroneous Channel Name :"+room+"\r\n");
-        return 0;
+int user::joinroom(String room, bool overrideblocks){
+    if( !overrideblocks ){
+        if( validatechannelname(room) == 0 ){
+            con->send( ":" + nick + "!user@user ERROR CHANNAME "+room+
+                " :Erroneous Channel Name :"+room+"\r\n");
+            return 0;
+        }
+        for( unsigned int i = 0; i < rooms.size();++i){
+                DEBUG;
+            if( rooms[i] < ::rooms.size() ){
+                if( ::rooms[rooms[i]].name.tolower() == room.tolower() ){
+
+                    con->send( ":" + nick + "!user@user ERROR PRESENT "+::rooms[rooms[i]].name+
+                             " :Cannot join "+::rooms[rooms[i]].name+" for you are already there\r\n");
+                    return 0;
+                }
+            }
+            else break;
+        }
     }
     for( unsigned int i = 0; i < rooms.size();++i){
+            DEBUG;
         if( rooms[i] < ::rooms.size() ){
             if( ::rooms[rooms[i]].name.tolower() == room.tolower() ){
+                struct room &r = ::rooms[rooms[i]];
+                for( unsigned int j = 0; j <r.usershave.size(); ++j ){
+                    if( r.usershave[j] == id ){
+                        printf("USER: %i\n", r.usershave[j]);
+                        con->send( ":" + nick + "!user@user ERROR PRESENT "+::rooms[rooms[i]].name+
+                                " :Cannot join "+::rooms[rooms[i]].name+" for you are already there\r\n");
+                        return 0;
+                    }
+                }
+                break;
 
-                con->send( ":" + nick + "!user@user ERROR PRESENT "+::rooms[rooms[i]].name+
-                         " :Cannot join "+::rooms[rooms[i]].name+" for you are already there\r\n");
-                return 0;
             }
         }
         else break;
     }
 
     for( unsigned int i = 0; i < ::rooms.size();++i){
+            DEBUG;
         if( ::rooms[i].name.tolower() == room.tolower() ){
             if( ::rooms[i].canjoin(id) ){
                 rooms.push_back( i );
@@ -539,6 +675,8 @@ int user::joinroom(String room){
     //a.accesslist.push_back( ACCESS_SOP );
     a.name = room;
     a.starowner = "";
+    a.motdsetby = 0;
+    a.motdseton = 0;
     ::rooms.push_back( a );
     rooms.push_back( ::rooms.size()-1 );
     return ::rooms[::rooms.size()-1].adduser(id,ACCESS_SOP);
@@ -618,6 +756,7 @@ DEBUG;
 }*/
 int getroombyname(String name){
     for( unsigned int i = 0; i < rooms.size(); ++i ){
+            DEBUG;
         if( rooms[i].name.tolower() == name.tolower() ){
             return i;
         }
@@ -627,6 +766,7 @@ int getroombyname(String name){
 
 int getuserbyname(String name){
     for( unsigned int i = 0; i < users.size(); ++i ){
+            DEBUG;
         if( users[i].nick.tolower() == name.tolower() ){
             return i;
         }
@@ -636,6 +776,7 @@ int getuserbyname(String name){
 
 int consumeguestpass( String pass ){
     for( unsigned int i = 0; i < guestpasses.size(); ++i ){
+            DEBUG;
         if( guestpasses[i] == pass ){
             guestpasses.erase( guestpasses.begin() + i );
             return 1;
@@ -644,6 +785,13 @@ int consumeguestpass( String pass ){
     return 0;
 }
 
+int intro(connection& c, String name ){
+    if( c.introd == true ) return 0;
+    c.introd = true;
+    c.send( ":"+servername+" 005 "+name+" CHANMODES=b, CHANTYPES=# CHARSET=utf-8 AWAYLEN=10 KICKLEN=256 MAXBANS=200 MAXCHANNELS=60 MAXPARA=32 :are supported by this server\r\n" );
+    c.send( ":"+servername+" 005 "+name+" NETWORK=Coldstorm NICKLEN=20 PREFIX=(sohv)~@#+ STATUSMSG=~@#+ TOPICLEN=200 :are supported by this server\r\n" );
+    return 1;
+}
 
 int onmsgnewsession( connection& c, vector<String> args ){
     String chk = args[0].tolower();
@@ -680,13 +828,18 @@ int onmsgnewsession( connection& c, vector<String> args ){
             ops.ip = getipstr( c.sock );
             ops.con = &c;
             c.usr = ops.id;
+            ops.echo = 0;
             c.send( ":"+c.ircname+"!user@user.user NICK "+ops.nick+"\r\n" );
-            for( unsigned int i = 0; i< ops.rooms.size(); ++i ){
-                if( ops.rooms[i] < rooms.size() ){
-                    switch( ::rooms[ops.rooms[i]].canjoin(ops.id) > 0 ){
-                        case 1: c.send( ":" + ops.nick + "!user@user JOIN "+rooms[ops.rooms[i]].name+"\r\n"); break;
-                        case 0: c.send( ":" + ops.nick + "!user@user ERROR BAN "+rooms[ops.rooms[i]].name+" :Cannot join "+rooms[ops.rooms[i]].name+" for you are banned\r\n"); break;
-                    }
+            vector<unsigned int> t = ops.rooms;
+            ops.rooms.clear();
+            for( unsigned int i = 0; i< t.size(); ++i ){
+                    DEBUG;
+                if( t[i] < rooms.size() ){
+                    users[ops.id].joinroom(rooms[t[i]].name,true);
+                   /* switch( ::rooms[t[i]].canjoin(ops.id) > 0 ){
+                        case 1: c.send( ":" + ops.nick + "!user@user JOIN "+rooms[t[i]].name+"\r\n"); break;
+                        case 0: c.send( ":" + ops.nick + "!user@user ERROR BAN "+rooms[t[i]].name+" :Cannot join "+rooms[t[i]].name+" for you are banned\r\n"); break;
+                    }*/
                 }
             }
             return 0;
@@ -723,6 +876,7 @@ int onmsgguest( connection& c, vector<String> args ){
         u.linestyped = 0;
         u.registered = time(0);
         u.con = &c;
+        u.echo = 0;
 
         c.usr = u.id;
         c.state = LOGIN_FULL;
@@ -760,16 +914,21 @@ int pong( int usr, String message ){
     return 1;
 }
 int privmsg( int usr, String target, String message ){
+    printf("PM to %s\n", target.c_str() );
     if( target[0] == '#' )
     {
+         printf("PM to room %s\n", target.c_str() );
         int t = getroombyname(target);
         if( t >= 0 ){
+            printf("sending\n");
             return rooms[t].privmsg(usr, message);
         }
     }
     else{
+            printf("PM to user%s\n", target.c_str() );
         int t = getuserbyname(target);
         if( t >= 0 ){
+                printf("sending\n");
             return users[t].privmsg(usr, message);
         }
     }
@@ -777,21 +936,37 @@ int privmsg( int usr, String target, String message ){
     return 1;
 }
 
+int whois( int usr, String message ){
+    //::users[usr].con->send("PONG :"+message+"\r\n");
+    int found = 0;
+    for( int i = 0; i < users.size(); ++i ){
+        if( message.tolower() == users[i].nick.tolower() ){
+            found = 1;
+            users[usr].con->send(":"+servername+" 311 "+users[usr].nick+" "+message+" "+users[usr].color+" "+users[usr].ip+" * :"+users[usr].name+"\r\n");
+        }
+    }
+    if( found == 0 ){
+        users[usr].con->send(":"+servername+" 401 "+users[usr].nick+" "+message+" :No such nick/channel\r\n");
+    }
+    users[usr].con->send(":"+servername+" 318 "+users[usr].nick+" * :End of /WHOIS list.\r\n");
+
+    return 1;
+}
 
 
 int onmsgfull( connection& c, vector<String> args ){
     String chk = args[0].tolower();
-    if( chk == "join" ){
+    if( chk == "join" && args.size() > 1 ){
         users[c.usr].joinroom(args[1]);
-    } else if( chk == "ping" ){
+    } else if( chk == "ping" && args.size() > 1 ){
         ping(c.usr, args[1] );
-    } else if( chk == "pong" ){
+    } else if( chk == "pong" && args.size() > 1 ){
         pong(c.usr, args[1] );
-    } else if( chk == "privmsg" ){
+    } else if( chk == "privmsg" && args.size() > 2 ){
         privmsg(c.usr, args[1], args[2] );
-    } else if( chk == "" ){
-
-    } else if( chk == "" ){
+    } else if( chk == "whois" && args.size() > 1 ){
+        whois(c.usr, args[1] );
+    } else if( chk == "" && args.size() > 2 ){
 
     }
 
@@ -821,18 +996,23 @@ int callbacktcp( connection& c, String msg ){
     return 0;
 }
 
+int onconnect(connection& c){
+    printf("\n\n\nfag\n\n\n");
+    return intro( c, "Auth" );
+}
 
 void listenfortcp(void*){
 
     DEBUG;
     connectiontcp con;
-    con.listen( 6667, callbacktcp );
+    con.listen( 6667, callbacktcp, onconnect );
 }
 void listenforajax(void*){
 
     DEBUG;
     connectionajax con;
-    con.listen(81, callbacktcp);
+    con.onconnect = onconnect;
+    con.listen(81, callbacktcp, onconnect);
 }
 
 void onquit(void){
@@ -859,6 +1039,7 @@ int main(){
     user u;
     u.id = 0;
     u.access = 0;
+    u.nick = u.name = u.ip = u.color = "";
     users.push_back( u );
 
 
@@ -867,12 +1048,18 @@ int main(){
     readdb("database.kdb");
 
     DEBUG;
-    atexit( onquit );
-    atexit( socketcleanup );
+    //atexit( onquit );
+    //atexit( socketcleanup );
 
     DEBUG;
 
-    guestpasses.push_back("qwertypoops");
+    guestpasses.push_back("1");
+    guestpasses.push_back("2");
+    guestpasses.push_back("3");
+    guestpasses.push_back("4");
+    guestpasses.push_back("5");
+    guestpasses.push_back("6");
+
 
     DEBUG;
 
@@ -890,6 +1077,7 @@ int main(){
 
     DEBUG;
     socketcleanup();
+    onquit();
     exit(0);
     return 0;
     /*while( true ){

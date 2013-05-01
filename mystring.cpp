@@ -57,7 +57,7 @@ vector<String> String::splitirc(){
     unsigned int i;
     for( i = 0; ret[i][0] != ':'; ++i ){}
     ret.resize( i+1 );
-    ret[i] = substr( l+1 );
+    ret[i] = substr( l+2 );
     return ret;
 }
 
