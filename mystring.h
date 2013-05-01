@@ -1,4 +1,5 @@
 #pragma once
+class String;
 #include<string>
 #include<vector>
 #include<stdio.h>

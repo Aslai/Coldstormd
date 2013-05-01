@@ -18,7 +18,10 @@
     #define closesocket(sock) close( sock )
 #endif
 #include<vector>
+#include "mystring.h"
 
 SOCKET bindSocket( int port );
 unsigned long getip( SOCKET sock );
 void socketcleanup( void );
+String getipstr(SOCKET sock);
+String getcountrycode(SOCKET sock);

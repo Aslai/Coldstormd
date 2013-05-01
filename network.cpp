@@ -33,3 +33,15 @@ void socketcleanup( void ){
         closesocket(bound[i]);
     }
 }
+
+String getipstr(SOCKET sock){
+    //TODO: Implement
+    sock *= 2;
+    return "192.168.1.1";
+}
+
+String getcountrycode(SOCKET sock){
+    //TODO: Implement
+    sock *= 2;
+    return "US";
+}

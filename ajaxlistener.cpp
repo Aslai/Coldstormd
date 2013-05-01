@@ -1,10 +1,6 @@
 #include "ajaxlistener.h"
 
 
-
-
-
-
 static String readsock(SOCKET sock){
     String ret = "";
     unsigned int len = 1000;
@@ -166,15 +162,27 @@ ajaxlistener::ajaxlistener(){
     sock = 0;
 }
 
-
+#ifdef DEBUGSTATEMENTS
+#define DEBUG printf("%s - %i\n", __FILE__, __LINE__)
+#else
+#define DEBUG
+#endif
 
 int ajaxlistener::listen( int port, int (*cb)(ajaxconnection&,void*), void* userdata ){
     sock = bindSocket( port );
     ::listen( sock, 10 );
     callback = cb;
     while( true ){
+        //DEBUG;
         SOCKET acceptsock = accept( sock, 0, 0 );
-        if( acceptsock == 0 ) {fprintf(stderr, "Error reading from AJAX Socket %i\n", port); break;}
+        if( acceptsock
+           #ifdef _WIN32
+           ==
+           #else
+           <=
+           #endif
+            0 ) {fprintf(stderr, "Error reading from AJAX Socket %i\n", port); break;}
+        //DEBUG;
         String a = readsock( acceptsock );
 
         http h = parsehttp( a );

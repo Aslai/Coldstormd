@@ -1,4 +1,5 @@
 #pragma once
+struct ajaxlistener;
 #include<stdarg.h>
 #include<stdlib.h>
 
