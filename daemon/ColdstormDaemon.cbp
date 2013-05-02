@@ -64,35 +64,38 @@
 			<Add option="-std=c++98" />
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
+			<Add directory="src/" />
 		</Compiler>
-		<Unit filename="ajaxlistener.cpp" />
-		<Unit filename="ajaxlistener.h" />
-		<Unit filename="callbacks.cpp" />
-		<Unit filename="callbacks.h" />
-		<Unit filename="coldstormd.cpp" />
-		<Unit filename="coldstormd.h" />
-		<Unit filename="connection.cpp" />
-		<Unit filename="connection.h" />
-		<Unit filename="constants.h" />
-		<Unit filename="database.cpp" />
-		<Unit filename="database.h" />
-		<Unit filename="http.cpp" />
-		<Unit filename="http.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="mystring.cpp" />
-		<Unit filename="mystring.h" />
-		<Unit filename="network.cpp" />
-		<Unit filename="network.h" />
-		<Unit filename="room.cpp" />
-		<Unit filename="room.h" />
-		<Unit filename="state.cpp" />
-		<Unit filename="state.h" />
-		<Unit filename="threading.cpp" />
-		<Unit filename="threading.h" />
-		<Unit filename="user.cpp" />
-		<Unit filename="user.h" />
-		<Unit filename="utility.cpp" />
-		<Unit filename="utility.h" />
+		<Unit filename="src/ajax/ajaxlistener.cpp" />
+		<Unit filename="src/ajax/ajaxlistener.h" />
+		<Unit filename="src/ajax/http.cpp" />
+		<Unit filename="src/ajax/http.h" />
+		<Unit filename="src/coldstormd/callbacks.cpp" />
+		<Unit filename="src/coldstormd/callbacks.h" />
+		<Unit filename="src/coldstormd/cmdcallbacks.cpp" />
+		<Unit filename="src/coldstormd/cmdcallbacks.h" />
+		<Unit filename="src/coldstormd/coldstormd.cpp" />
+		<Unit filename="src/coldstormd/coldstormd.h" />
+		<Unit filename="src/coldstormd/connection.cpp" />
+		<Unit filename="src/coldstormd/connection.h" />
+		<Unit filename="src/coldstormd/constants.h" />
+		<Unit filename="src/coldstormd/database.cpp" />
+		<Unit filename="src/coldstormd/database.h" />
+		<Unit filename="src/coldstormd/room.cpp" />
+		<Unit filename="src/coldstormd/room.h" />
+		<Unit filename="src/coldstormd/state.cpp" />
+		<Unit filename="src/coldstormd/state.h" />
+		<Unit filename="src/coldstormd/user.cpp" />
+		<Unit filename="src/coldstormd/user.h" />
+		<Unit filename="src/coldstormd/utility.cpp" />
+		<Unit filename="src/coldstormd/utility.h" />
+		<Unit filename="src/general/mystring.cpp" />
+		<Unit filename="src/general/mystring.h" />
+		<Unit filename="src/general/network.cpp" />
+		<Unit filename="src/general/network.h" />
+		<Unit filename="src/general/threading.cpp" />
+		<Unit filename="src/general/threading.h" />
+		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -131,55 +131,6 @@ namespace ColdstormD{
 
 
 
-    int ping( int usr, String message ){
-        ColdstormD::users[usr].con->send("PONG :"+message+"\r\n");
-        return 1;
-    }
-    int pong( int usr, String message ){
-        //::users[usr].con->send("PONG :"+message+"\r\n");
-        message[0]=message[0];
-        usr*=2;
-        return 1;
-    }
-    int privmsg( int usr, String target, String message ){
-        printf("PM to %s\n", target.c_str() );
-        if( target[0] == '#' )
-        {
-             printf("PM to room %s\n", target.c_str() );
-            int t = getroombyname(target);
-            if( t >= 0 ){
-                printf("sending\n");
-                return rooms[t].privmsg(usr, message);
-            }
-        }
-        else{
-                printf("PM to user%s\n", target.c_str() );
-            int t = getuserbyname(target);
-            if( t >= 0 ){
-                    printf("sending\n");
-                return users[t].privmsg(usr, message);
-            }
-        }
-        //::users[usr].con->send("PONG :"+message+"\r\n");
-        return 1;
-    }
-
-    int whois( int usr, String message ){
-        //::users[usr].con->send("PONG :"+message+"\r\n");
-        int found = 0;
-        for( unsigned int i = 0; i < users.size(); ++i ){
-            if( message.tolower() == users[i].nick.tolower() ){
-                found = 1;
-                users[usr].con->send(":"+servername+" 311 "+users[usr].nick+" "+message+" "+users[usr].color+" "+users[usr].ip+" * :"+users[usr].name+"\r\n");
-            }
-        }
-        if( found == 0 ){
-            users[usr].con->send(":"+servername+" 401 "+users[usr].nick+" "+message+" :No such nick/channel\r\n");
-        }
-        users[usr].con->send(":"+servername+" 318 "+users[usr].nick+" * :End of /WHOIS list.\r\n");
-
-        return 1;
-    }
 
 
     int onmsgfull( connection& c, vector<String> args ){
@@ -187,13 +138,13 @@ namespace ColdstormD{
         if( chk == "join" && args.size() > 1 ){
             users[c.usr].joinroom(args[1]);
         } else if( chk == "ping" && args.size() > 1 ){
-            ping(c.usr, args[1] );
+            callbacks::ping(c.usr, args[1] );
         } else if( chk == "pong" && args.size() > 1 ){
-            pong(c.usr, args[1] );
+            callbacks::pong(c.usr, args[1] );
         } else if( chk == "privmsg" && args.size() > 2 ){
-            privmsg(c.usr, args[1], args[2] );
+            callbacks::privmsg(c.usr, args[1], args[2] );
         } else if( chk == "whois" && args.size() > 1 ){
-            whois(c.usr, args[1] );
+            callbacks::whois(c.usr, args[1] );
         } else if( chk == "part" && args.size() > 1 ){
 
         } else if( chk == "" && args.size() > 1 ){
