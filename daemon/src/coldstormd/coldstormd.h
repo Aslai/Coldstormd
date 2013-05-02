@@ -4,6 +4,10 @@
 #include "general/threading.h"
 #include "coldstormd/callbacks.h"
 #include "coldstormd/database.h"
+#include "coldstormd/state.h"
+#include "coldstormd/cmdcallbacks.h"
+
+
 
 namespace ColdstormD{
     int run();

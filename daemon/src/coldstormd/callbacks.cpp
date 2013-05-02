@@ -135,16 +135,21 @@ namespace ColdstormD{
 
     int onmsgfull( connection& c, vector<String> args ){
         String chk = args[0].tolower();
-        if( chk == "join" && args.size() > 1 ){
-            users[c.usr].joinroom(args[1]);
+
+        for( int i = functions[chk].size(); i > 0; --i ){
+            if( functions[chk][i-1](c, args) == 0 )
+                break;
+        }
+        /*if( chk == "join" && args.size() > 1 ){
+            callbacks::join( c, args );
         } else if( chk == "ping" && args.size() > 1 ){
-            callbacks::ping(c.usr, args[1] );
+            callbacks::ping(c, args );
         } else if( chk == "pong" && args.size() > 1 ){
-            callbacks::pong(c.usr, args[1] );
+            callbacks::pong( c, args );
         } else if( chk == "privmsg" && args.size() > 2 ){
-            callbacks::privmsg(c.usr, args[1], args[2] );
+            callbacks::privmsg( c, args );
         } else if( chk == "whois" && args.size() > 1 ){
-            callbacks::whois(c.usr, args[1] );
+            callbacks::whois( c, args );
         } else if( chk == "part" && args.size() > 1 ){
 
         } else if( chk == "" && args.size() > 1 ){
@@ -155,7 +160,7 @@ namespace ColdstormD{
 
         } else if( chk == "" && args.size() > 1 ){
 
-        }
+        }*/
 
 
         return 0;

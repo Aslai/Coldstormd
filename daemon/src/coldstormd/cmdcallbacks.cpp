@@ -2,17 +2,32 @@
 
 namespace ColdstormD{
     namespace callbacks{
-        int ping( int usr, String message ){
-            ColdstormD::users[usr].con->send("PONG :"+message+"\r\n");
+        int ping( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            int usr = c.usr;
+            ColdstormD::users[usr].con->send("PONG :"+args[1]+"\r\n");
             return 1;
         }
-        int pong( int usr, String message ){
-            //::users[usr].con->send("PONG :"+message+"\r\n");
-            message[0]=message[0];
-            usr*=2;
+        int pong( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            ColdstormD::users[c.usr].con->send("PONG :"+args[1]+"\r\n");
             return 1;
         }
-        int privmsg( int usr, String target, String message ){
+        int privmsg( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            int usr = c.usr;
+            String target = args[1];
+            String message = args[2];
+
             printf("PM to %s\n", target.c_str() );
             if( target[0] == '#' )
             {
@@ -35,8 +50,14 @@ namespace ColdstormD{
             return 1;
         }
 
-        int whois( int usr, String message ){
+        int whois( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
             //::users[usr].con->send("PONG :"+message+"\r\n");
+            int usr = c.usr;
+            String message = args[1];
             int found = 0;
             for( unsigned int i = 0; i < users.size(); ++i ){
                 if( message.tolower() == users[i].nick.tolower() ){
@@ -51,58 +72,194 @@ namespace ColdstormD{
 
             return 1;
         }
-
-        int nick( int usr, String message ){
+        int join( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return users[c.usr].joinroom(args[1]);
         }
-        int part( int usr, String message ){
+        int nick( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int motd( int usr, String channel, String message ){
+        int part( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int invite( int usr, String channel, String target ){
+        int motd( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int ban( int usr, String channel, String target, int length, String message ){
+        int invite( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int unban( int usr, String channel, String target, int length, String message ){
+        int ban( connection& c, vector<String> args ){
+            if( args.size() < 4 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int kick( int usr, String channel, String target, String message ){
+        int unban( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int mute( int usr, String channel, String target, int length ){
+        int kick( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int mod( int usr, String target ){
+        int mute( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int star( int usr, String target ){
+        int mod( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int op( int usr, String target ){
+        int star( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int sop( int usr, String target ){
+        int op( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int options( int usr, String opttype, String optvalue ){
+        int sop( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servmute( int usr, String target, int duration ){
+        int options( connection& c, vector<String> args ){
+            if( args.size() < 4 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int guestpass( int usr ){
+        int servmute( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servstrip( int usr, String target ){
+        int guestpass( connection& c, vector<String> args ){
+            if( args.size() < 1 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int strip( int usr, String channel, String target ){
+        int servstrip( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servoper( int usr, String target ){
+        int strip( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servmod( int usr, String target ){
+        int servoper( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servban( int usr, String target, int duration, String message ){
+        int servmod( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servunban( int usr, String target ){
+        int servban( connection& c, vector<String> args ){
+            if( args.size() < 4 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int servbanlist( int usr ){
+        int servunban( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int banlist( int usr, String channel ){
+        int servbanlist( connection& c, vector<String> args ){
+            if( args.size() < 1 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int help( int usr ){
+        int banlist( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int echo( int usr, String tf ){
+        int help( connection& c, vector<String> args ){
+            if( args.size() < 1 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
-        int names( int usr, String channel ){
+        int echo( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
+        }
+        int names( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return 0;
+            }
+            return 1;
         }
     }
 }

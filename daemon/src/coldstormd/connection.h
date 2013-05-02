@@ -9,6 +9,8 @@ namespace ColdstormD{
 #include "general/threading.h"
 #include "ajax/ajaxlistener.h"
 #include "coldstormd/constants.h"
+#include "coldstormd/state.h"
+
 
 namespace ColdstormD{
     struct connection{

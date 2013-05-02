@@ -16,8 +16,6 @@ namespace ColdstormD{
         LOGIN_FULL
     };
 
-    const String servername = "coldstorm.tk";
-
     enum {
         ACCESS_NONE=0,
         ACCESS_VOP=1,
