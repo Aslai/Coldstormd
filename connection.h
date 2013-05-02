@@ -24,11 +24,13 @@ namespace ColdstormD{
         String ircname;
         SOCKET sock;
         int introd;
+        int closed;
 
         virtual int send( String data ) = 0;
         virtual void listen( int port, int (*cb)( connection& c, String msg ), int (*oncon)( connection& c ), int (*onq)( connection& c ) ) = 0;
 
         void notice(String text);
+        virtual int close() = 0;
     };
 
 
@@ -39,6 +41,7 @@ namespace ColdstormD{
         int send( String data );
         static int callme( ajaxlistener::ajaxconnection& c, void* d );
         void listen( int port, int (*cb)( connection& c, String msg )=0, int (*oncon)( connection& c )=0, int (*onq)( connection& c )=0  );
+        int close();
     };
 
     struct connectiontcp : connection{
@@ -47,5 +50,6 @@ namespace ColdstormD{
         int isvalid();
         void listen( int port, int (*cb)( connection& c, String msg )=0, int (*oncon)( connection& c )=0, int (*onq)( connection& c )=0  );
         static void recvloop( void* slf );
+        int close();
     };
 }

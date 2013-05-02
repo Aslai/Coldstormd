@@ -139,11 +139,12 @@ namespace ColdstormD{
         //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
         return 1;
     }
-    int room::partuser(int usr){
+    int room::partuser(int usr,bool supressmsg){
         for( unsigned int i = 0; i < usershave.size(); ++i ){
                 DEBUG;
             if( usershave[i] == usr ){
-                broadcast(usr, ":" + ColdstormD::users[usr].getmask() + " PART "+name+"\r\n", false);
+                if( !supressmsg )
+                    broadcast(usr, ":" + ColdstormD::users[usr].getmask() + " PART "+name+" :Leaving\r\n", false);
                 usershave.erase( usershave.begin() + i );
                 return 1;
             }

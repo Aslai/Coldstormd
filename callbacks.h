@@ -20,4 +20,5 @@ namespace ColdstormD{
     void listenfortcp(void*);
     void listenforajax(void*);
     void onquit(void);
+    int onconclose(connection& c);
 }

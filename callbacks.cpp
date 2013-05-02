@@ -9,6 +9,7 @@ namespace ColdstormD{
         return 1;
     }
 
+
     int onmsgnewsession( connection& c, vector<String> args ){
         String chk = args[0].tolower();
         if( chk == "nick" ){
@@ -38,13 +39,20 @@ namespace ColdstormD{
                 return 0;
             }
             if( ops.password == args[2] ){
+                if( ops.online != 0 ){
+                    c.notice( "You are still logged in!" );
+                    ops.con->close();
+                    return 0;
+                }
                 c.state = LOGIN_FULL;
                 c.notice( "Successfully logged in as "+args[1] );
                 ops.country = getcountrycode( c.sock );
+
                 ops.ip = getipstr( c.sock );
                 ops.con = &c;
                 c.usr = ops.id;
                 ops.echo = 0;
+                ops.online = 1;
                 c.send( ":"+c.ircname+"!user@user.user NICK "+ops.nick+"\r\n" );
                 vector<unsigned int> t = ops.rooms;
                 ops.rooms.clear();
@@ -77,6 +85,10 @@ namespace ColdstormD{
         if( chk == "setpass" ){
             if( args.size() <= 1 ){
                 c.notice( "Usage: /SETPASS [password]" );
+                return 0;
+            }
+            if( args[1].length() > 100 ){
+                c.notice( "Please keep your password under 100 characters" );
                 return 0;
             }
             user u;
@@ -202,7 +214,6 @@ namespace ColdstormD{
     int callbacktcp( connection& c, String msg ){
 
         DEBUG;
-        printf("poo %s\n", msg.c_str() );
         vector<String> args = msg.splitirc();
         String chk = args[0].tolower();
 
@@ -222,22 +233,28 @@ namespace ColdstormD{
     }
 
     int onconnect(connection& c){
-        printf("\n\n\nfag\n\n\n");
         return intro( c, "Auth" );
+    }
+    int onconclose(connection& c){
+        if( c.usr > 0 ){
+            ColdstormD::users[c.usr].quit("Connection reset");
+            return 1;
+        }
+        return 0;
     }
 
     void listenfortcp(void*){
 
         DEBUG;
         connectiontcp con;
-        con.listen( 6667, callbacktcp, onconnect );
+        con.listen( 6667, callbacktcp, onconnect, onconclose );
     }
     void listenforajax(void*){
 
         DEBUG;
         connectionajax con;
         con.onconnect = onconnect;
-        con.listen(6666, callbacktcp, onconnect);
+        con.listen(6666, callbacktcp, onconnect, onconclose);
     }
 
     void onquit(void){

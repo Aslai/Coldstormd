@@ -14,6 +14,7 @@ namespace ColdstormD{
         introd = false;
         onquit = 0;
         onconnect = 0;
+        closed = 0;
     }
     int connectionajax::send( String data ){
         mutex_lock(locked);
@@ -30,7 +31,7 @@ namespace ColdstormD{
         ajaxlistener* p = c.parent;
         String cook = c.cookie.c_str();
         printf("%s", cook.c_str() );
-        while(true){
+        while(!self->closed){
             if( p->isvalid(cook) ){
                 printf("%s", cook.c_str() );
                 c.lock();
@@ -40,6 +41,8 @@ namespace ColdstormD{
                     rbuf += a;
                     printf(" A: %s ", a.c_str() ); fflush(stdout);
                     vector<String> lines = rbuf.split("\r\n");
+                    if( lines[0].length() > 2000 || rbuf.length() > 4000 )
+                        self->close();
                     for( unsigned int i = 0; i < lines.size()-1; ++i ){
                         self->callback( *self, lines[i] );
                     }
@@ -58,7 +61,7 @@ namespace ColdstormD{
                 c.unlock();
             }
             else break;
-            Sleep(50);
+            Sleep(100);
         }
         if( self->onquit != 0 )
             self->onquit(*self);
@@ -71,6 +74,11 @@ namespace ColdstormD{
         onquit = onq;
         con.listen( port, callme, (void*) this );
     }
+    int connectionajax::close(){
+        closed = 1;
+        return 1;
+    }
+
 
     connectiontcp::connectiontcp(){
         sock = -1;
@@ -80,6 +88,7 @@ namespace ColdstormD{
         introd = false;
         onquit = 0;
         onconnect = 0;
+        closed = 0;
     }
     int connectiontcp::send( String data ){
         char* tmp = (char*)data.c_str();
@@ -126,23 +135,38 @@ namespace ColdstormD{
         String buffer = "";
         self->notice("Please authenticate with /VALIDATE [name] [password]");
         while( true ){
+            Sleep(100);
             char buf[1001];
             int len = recv( self->sock, buf, 1000, 0 );
-            if( len < -0 ) break;
+            DEBUG;
+            if( len <= -0 ) {
+                DEBUG;
+                break;
+            }
             for( int i = 0; i < len; ++i ){
                 if( buf[i] == -0 ) buf[i] -= 1;
             }
             buf[len] = 0;
             buffer += buf;
             vector<String> lines = buffer.split("\r\n");
+            if( lines[0].length() > 2000 || buffer.length() > 4000 )
+                self->close();
             for( unsigned int i = 0; i < lines.size(); ++i ){
                 if( lines[i] != "" )
                 self->callback( *self, lines[i] );
             }
             buffer = lines[lines.size()-1];
         }
-        self->sock = -1;
+        self->sock = 0;
+        DEBUG;
         if( self->onquit != 0 )
             self->onquit(*self);
     }
+    int connectiontcp::close(){
+        closed = 1;
+        closesocket( sock );
+        return 1;
+    }
+
 }
+

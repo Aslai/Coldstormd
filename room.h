@@ -18,7 +18,7 @@ namespace ColdstormD{
         int motdseton;
         int canjoin( int usr );
         int adduser( int usr, int access = ACCESS_NONE );
-        int partuser( int usr );
+        int partuser( int usr, bool supress = false );
         int removeuser( int usr );
         int privmsg( int usr, String msg );
         int notice( int usr, String msg );

@@ -23,11 +23,6 @@ static String readsock(SOCKET sock){
 
 
 
-
-
-
-
-
 void ajaxlistener::runcallback(void* sel){
     cbargs* self = (cbargs*) sel;
     //String cook = self->con->cookie;

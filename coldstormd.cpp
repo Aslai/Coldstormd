@@ -45,7 +45,7 @@ namespace ColdstormD{
         char test[100];
 
         DEBUG;
-        char* consume = gets(test);
+        gets(test);
 
         DEBUG;
         socketcleanup();

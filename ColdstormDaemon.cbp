@@ -38,7 +38,6 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-std=c++98" />
 					<Add option="-g" />
 					<Add option="-DDEBUGSTATEMENTS" />
 				</Compiler>
@@ -62,6 +61,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-pedantic-errors" />
+			<Add option="-std=c++98" />
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
 		</Compiler>

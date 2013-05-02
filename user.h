@@ -23,12 +23,16 @@ namespace ColdstormD{
         vector<unsigned int> rooms;
         int id;
 
+        int inroom(unsigned int roomname);
 
         int joinroom(String room, bool overrideblocks=false);
         int privmsg( int usr, String msg );
+        int partroom(String room, String message );
+
         int notice( int usr, String msg );
         String getmask();
         int write( FILE* f );
         int read( FILE* f );
+        int quit( String message );
     };
 }

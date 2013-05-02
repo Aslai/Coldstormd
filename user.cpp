@@ -49,10 +49,12 @@ namespace ColdstormD{
 
     int user::privmsg( int usr, String msg ){
         con->send(":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+nick+" :" + msg+"\r\n" );
+        linestyped++;
         return 1;
     }
     int user::notice( int usr, String msg ){
         con->send(":"+ColdstormD::users[usr].getmask()+" NOTICE "+nick+" :" + msg+"\r\n" );
+        linestyped++;
         return 1;
     }
 
@@ -124,5 +126,42 @@ namespace ColdstormD{
         ColdstormD::rooms.push_back( a );
         rooms.push_back( ColdstormD::rooms.size()-1 );
         return ColdstormD::rooms[ColdstormD::rooms.size()-1].adduser(id,ACCESS_SOP);
+    }
+
+
+    int user::inroom( unsigned int roomname ){
+        for( unsigned int i = 0; i < rooms.size(); ++i ){
+            if( rooms[i] == roomname ){
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    int user::partroom(String room, String message){
+        int rm = getroombyname( room );
+        if( rm < 0 ) return 0;
+        if( !inroom( rm ) ) return 0;
+        for( unsigned int i = 0; i < rooms.size(); ++i ){
+            if( rooms[i] == (unsigned)rm ){
+                rooms.erase(rooms.begin() + i );
+                break;
+            }
+        }
+        message[0] = 'a';
+        //ColdstormD::rooms[rm].broadcast(id, ":"+getmask()+" PART "+room+" :"+message+"\r\n");
+        ColdstormD::rooms[rm].partuser(id);
+
+        return 1;
+    }
+
+    int user::quit(String message){
+        DEBUG;
+        for( unsigned int i = 0; i < rooms.size(); ++i ){
+            ColdstormD::rooms[rooms[i]].broadcast(id, ":"+getmask()+" QUIT :"+message+"\r\n");
+            ColdstormD::rooms[rooms[i]].partuser(id,true);
+        }
+        online = false;
+        return 1;
     }
 }
