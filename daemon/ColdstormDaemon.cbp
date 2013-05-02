@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ColdstormDaemon" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/ColdstormDaemon" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DDEBUGSTATEMENTS" />
+				</Compiler>
+				<Linker>
+					<Add library="ws2_32" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/ColdstormDaemon" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="ws2_32" />
+				</Linker>
+			</Target>
+			<Target title="DebugLinux">
+				<Option output="bin/Debug/ColdstormDaemon" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DDEBUGSTATEMENTS" />
+				</Compiler>
+				<Linker>
+					<Add library="pthread" />
+				</Linker>
+			</Target>
+			<Target title="ReleaseLinux">
+				<Option output="bin/Release/ColdstormDaemon" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="pthread" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-pedantic-errors" />
+			<Add option="-std=c++98" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="ajaxlistener.cpp" />
+		<Unit filename="ajaxlistener.h" />
+		<Unit filename="callbacks.cpp" />
+		<Unit filename="callbacks.h" />
+		<Unit filename="coldstormd.cpp" />
+		<Unit filename="coldstormd.h" />
+		<Unit filename="connection.cpp" />
+		<Unit filename="connection.h" />
+		<Unit filename="constants.h" />
+		<Unit filename="database.cpp" />
+		<Unit filename="database.h" />
+		<Unit filename="http.cpp" />
+		<Unit filename="http.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="mystring.cpp" />
+		<Unit filename="mystring.h" />
+		<Unit filename="network.cpp" />
+		<Unit filename="network.h" />
+		<Unit filename="room.cpp" />
+		<Unit filename="room.h" />
+		<Unit filename="state.cpp" />
+		<Unit filename="state.h" />
+		<Unit filename="threading.cpp" />
+		<Unit filename="threading.h" />
+		<Unit filename="user.cpp" />
+		<Unit filename="user.h" />
+		<Unit filename="utility.cpp" />
+		<Unit filename="utility.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

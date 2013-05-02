@@ -2,18 +2,26 @@ Progress
 ========
 
 
-###As of Wednesday, May 1, 2013, the following features have yet to be implemented:
+###As of Wednesday, May 1, 2013, the following features have yet to be implemented on the server:
 
+* General server things
 * Implement oper global commands 
  * SERVKICK
  * SERVBAN [time]
  * SERVUNBAN
+ * SERVMOD [user]
+ * SERVOPER [user]
+ * SERVSTRIP [user]
 * Implement Moderator global commands 
  * GUESTPASS
  * SERVMUTE [time]
+* Implement channel level sop commands
+ * MODE [mode]
+ * SOP [user]
+ * OP [user]
 * Implement channel level operator commands 
  * STAR [user]
- * MODE [mode]
+ * MOD [user]
 * Implement channel level moderator commands 
  * MUTE [user]
  * KICK
@@ -24,31 +32,18 @@ Progress
  * NICK
 
 
+###The following features have been implemented on the server:
 
-###As of Tuesday, April 30, 2013, the following features have yet to be implemented:
-
-* Users should only be allowed to have one session at a time
-* Implement oper global commands (servkick, servban [time], servunban)
-* Implement Moderator global commands (guestpass, servmute)
-* Implement channel level operator commands (star, mode)
-* Implement channel level moderator commands (mute, kick, ban [time], invite)
-* Implement NICK
-* Bandwidth limiting
-* Limit Password Length
-* More scalable methods of obtaining an ID from string
-
-
-
-###As of Saturday, April 27, 2013, the following features have yet to be implemented:
-
-* Users should only be allowed to have one session at a time
-* Rooms need to properly relay messages
-* Implement oper global commands (servkick, servban [time], servunban)
-* Implement Moderator global commands (guestpass, servmute)
-* Implement channel level operator commands (star, mode)
-* Implement channel level moderator commands (mute, kick, ban [time], invite)
-* Implement NICK
-* Bandwidth limiting
-* Limit Password Length
-* Private Message routing
-* More scalable methods of obtaining an ID from string
+* General server things
+ * VALIDATE / SETPASS
+ * Bandwidth limits
+ * Connection failure handling
+ * Limit number of sessions per account to one
+* Oper global commands 
+* Moderator global commands
+* Channel level sop commands
+* Channel level operator commands
+* Channel level moderator commands
+* Channel level user commands
+ * JOIN
+* Global user commands
