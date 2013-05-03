@@ -2,8 +2,11 @@
 
 namespace ColdstormD{
     int room::write( FILE* f ){
-        int len = name.write(0) + starowner.write(0) + motd.write(0) + writeint(0, motdsetby) + writeint(0, motdseton) ;
+        int len = name.write(0) + starowner.write(0) + motd.write(0) + writeint(0, motdsetby) + writeint(0, motdseton) + writeint(0, motdseton) + writeint(0, motdseton);
         for( unsigned int i = 0; i < accesslist.size(); ++i ) len += writeint( 0, accesslist[i] );
+        for( unsigned int i = 0; i < users.size(); ++i ) len += writeint( 0, users[i] );
+        for( unsigned int i = 0; i < motdhist.size(); ++i ) len += motdhist[i].write(0);
+
         if( f != 0 ){
             fwrite(&len, 1, sizeof(uint32_t), f );
             name.write(f);
@@ -13,6 +16,12 @@ namespace ColdstormD{
             writeint(f, motdseton);
             writeint( f, accesslist.size() );
             for( unsigned int i = 0; i < accesslist.size(); ++i ) len += writeint( f, accesslist[i] );
+            writeint( f, users.size() );
+            for( unsigned int i = 0; i < users.size(); ++i ) len += writeint( f, users[i] );
+            writeint( f, motdhist.size() );
+            for( unsigned int i = 0; i < motdhist.size(); ++i ) len += motdhist[i].write(f);
+
+
         }
         return len + sizeof(len);
     }
@@ -40,6 +49,25 @@ namespace ColdstormD{
             DEBUG;
 
         }
+        toread = readint( f );
+        DEBUG;
+        for( unsigned int i = 0; i < toread; ++i ){
+            DEBUG;
+            users.push_back( readint( f ) );
+            DEBUG;
+
+        }
+        toread = readint( f );
+        DEBUG;
+        for( unsigned int i = 0; i < toread; ++i ){
+            DEBUG;
+            String bean;
+            bean.read( f );
+            motdhist.push_back( bean );
+            DEBUG;
+
+        }
+
         DEBUG;
         return len + sizeof(len);
     }
@@ -108,7 +136,7 @@ namespace ColdstormD{
         return 1;
     }
 
-    int room::adduser( int usr, int access ){
+    int room::adduser( int usr, int access, bool forcejoin ){
         if( !canjoin(usr) ) return 0;
 
         for( unsigned int i = 0; i < usershave.size(); ++i ){
@@ -120,22 +148,24 @@ namespace ColdstormD{
         for( unsigned int i = 0; i < users.size(); ++i ){
             DEBUG;
             if( ColdstormD::users[users[i]].id == usr ){
-                usershave.push_back(usr);
-                DEBUG;
-
-
-                broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" JOIN "+name+"\r\n", false);
-                sendinfo(usr);
+                if( forcejoin ){
+                    usershave.push_back(usr);
+                    DEBUG;
+                    broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" JOIN "+name+"\r\n", false);
+                    sendinfo(usr);
+                }
                 return 1;
             }
         }
 
         users.push_back(usr);
         accesslist.push_back(access);
-        usershave.push_back(usr);
-        DEBUG;
-        broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" JOIN "+name+"\r\n", false);
-        sendinfo(usr);
+        if( forcejoin ){
+            usershave.push_back(usr);
+            DEBUG;
+            broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" JOIN "+name+"\r\n", false);
+            sendinfo(usr);
+        }
         //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
         return 1;
     }
@@ -171,4 +201,32 @@ namespace ColdstormD{
         broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" NOTICE "+name+" :" + msg+"\r\n" );
         return 1;
     }
+    int room::useraccess(int id){
+        for( unsigned int i = 0; i < users.size(); ++i ){
+            if( users[i] == id ){
+                return accesslist[i];
+            }
+        }
+        return ACCESS_NONE;
+    }
+    int room::setmotd(int usr, String mo){
+        if( ( useraccess(usr) & ACCESS_HOP ) == 0 ){
+            return 0;
+        }
+        motd = mo;
+        motdhist.push_back(I(time(0))+": "+mo);
+        broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" TOPIC "+name+" :"+mo+"\r\n");
+        return 1;
+    }
+    int room::invite(int usr, int target){
+        if( ( useraccess(usr) & ACCESS_HOP ) == 0 ){
+            return 0;
+        }
+        String msg = ":"+ColdstormD::users[usr].getmask()+" INVITE "+name+" "+ColdstormD::users[target].nick+"\r\n";
+        broadcast( usr, msg );
+        ColdstormD::users[usr].con->send(msg);
+        adduser( target, ACCESS_NONE, false );
+        return 1;
+    }
+
 }

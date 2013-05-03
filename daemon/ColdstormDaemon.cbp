@@ -66,6 +66,7 @@
 			<Add option="-Wall" />
 			<Add directory="src/" />
 		</Compiler>
+		<Unit filename="../README.md" />
 		<Unit filename="src/ajax/ajaxlistener.cpp" />
 		<Unit filename="src/ajax/ajaxlistener.h" />
 		<Unit filename="src/ajax/http.cpp" />

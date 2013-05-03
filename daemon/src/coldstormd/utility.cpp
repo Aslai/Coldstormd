@@ -28,6 +28,7 @@ namespace ColdstormD{
 
 
 
+
     String I(int in){
         int l = snprintf(0, 0, "%i", in);
         String ret;
@@ -54,12 +55,22 @@ namespace ColdstormD{
     int getuserbyname(String name){
         for( unsigned int i = 0; i < users.size(); ++i ){
                 DEBUG;
+            if( users[i].name.tolower() == name.tolower() ){
+                return i;
+            }
+        }
+        return -1;
+    }
+    int getuserbynick(String name){
+        for( unsigned int i = 0; i < users.size(); ++i ){
+                DEBUG;
             if( users[i].nick.tolower() == name.tolower() ){
                 return i;
             }
         }
         return -1;
     }
+
 
     int consumeguestpass( String pass ){
         for( unsigned int i = 0; i < guestpasses.size(); ++i ){

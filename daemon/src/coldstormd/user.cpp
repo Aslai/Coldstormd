@@ -164,4 +164,11 @@ namespace ColdstormD{
         online = false;
         return 1;
     }
+    int user::broadcast(String message){
+        DEBUG;
+        for( unsigned int i = 0; i < rooms.size(); ++i ){
+            ColdstormD::rooms[rooms[i]].broadcast(id, ":"+getmask()+" "+message+"\r\n");
+        }
+        return 1;
+    }
 }

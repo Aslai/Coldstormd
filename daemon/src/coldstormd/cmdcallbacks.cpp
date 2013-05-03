@@ -40,7 +40,7 @@ namespace ColdstormD{
             }
             else{
                     printf("PM to user%s\n", target.c_str() );
-                int t = getuserbyname(target);
+                int t = getuserbynick(target);
                 if( t >= 0 ){
                         printf("sending\n");
                     return users[t].privmsg(usr, message);
@@ -84,6 +84,16 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return 0;
             }
+            if( getuserbynick( args[1] ) >= 0 ){
+                c.notice("Nickname already in use");
+                return 0;
+            }
+            if( !validateusername(args[1]) ){
+                c.notice("Erroneous nickname");
+                return 0;
+            }
+            users[c.usr].broadcast("NICK "+args[1] );
+            users[c.usr].nick = args[1];
             return 1;
         }
         int part( connection& c, vector<String> args ){
@@ -91,11 +101,21 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return 0;
             }
-            return 1;
+
+            return users[c.usr].partroom(args[1], args.size() > 2 ? args[2] : "" );
         }
         int motd( connection& c, vector<String> args ){
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
+                return 0;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return 0;
+            }
+            if( rooms[rm].setmotd(c.usr, args[2]) == 0 ){
+                c.notice("Insufficient permissions");
                 return 0;
             }
             return 1;
@@ -103,6 +123,21 @@ namespace ColdstormD{
         int invite( connection& c, vector<String> args ){
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
+                return 0;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return 0;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return 0;
+            }
+
+            if( rooms[rm].invite(c.usr, us) == 0 ){
+                c.notice("Insufficient permission");
                 return 0;
             }
             return 1;

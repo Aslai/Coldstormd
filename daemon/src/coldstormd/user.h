@@ -34,5 +34,6 @@ namespace ColdstormD{
         int write( FILE* f );
         int read( FILE* f );
         int quit( String message );
+        int broadcast(String message);
     };
 }
