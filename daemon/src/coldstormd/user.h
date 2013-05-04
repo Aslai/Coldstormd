@@ -28,6 +28,7 @@ namespace ColdstormD{
         int joinroom(String room, bool overrideblocks=false);
         int privmsg( int usr, String msg );
         int partroom(String room, String message );
+        int extractroom(String room);
 
         int notice( int usr, String msg );
         String getmask();

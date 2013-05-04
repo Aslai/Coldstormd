@@ -8,6 +8,8 @@ namespace ColdstormD{ struct room; }
 
 namespace ColdstormD{
     struct room{
+        int id;
+        int accesslink;
         String name;
         String starowner;
         vector<int> users;
@@ -28,6 +30,10 @@ namespace ColdstormD{
         int useraccess(int usr);
         int setmotd(int usr, String mo);
         int invite(int usr, int target);
+        int kick(int usr, int target, String reason);
+        int ban(int usr, int target, String reason );
+        int setaccess(int usr, int target, int access, int requiredaccess);
+        int mute(int usr, int target, String reason );
 
         void broadcast(int usr, String message, bool supressecho = true);
 

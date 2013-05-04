@@ -22,7 +22,6 @@ Progress
   * MODE -m [user] -> UNMUTE [user]
   * More to be added
  * Implement IP discovery and country lookup
- * MOTD memory
 * Implement oper global commands
  * SERVKICK [user]
  * SERVBAN [time]
@@ -40,17 +39,11 @@ Progress
 * Implement channel level operator commands
  * STAR [user]
  * MOD [user]
-* Implement channel level moderator commands
- * MUTE [user]
- * KICK [user]
- * BAN [time]
  * UNBAN [user]
- * INVITE [user]
- * MOTD [motd]
+* Implement channel level moderator commands
  * STRIP [user]
  * VOICE [user]
 * Implement Channel level user commands
- * PART
  * BANLIST
  * HELP
 * Implement global user commands
@@ -68,11 +61,18 @@ Progress
  * Connection failure handling
  * Limit number of sessions per account to one
  * WHOIS
+ * MOTD memory
 * Oper global commands
 * Moderator global commands
 * Channel level sop commands
 * Channel level operator commands
+ * KICK [user]
+ * BAN [time]
 * Channel level moderator commands
+ * MUTE [user]
+ * INVITE [user]
+ * MOTD [motd]
 * Channel level user commands
  * JOIN
+ * PART
 * Global user commands

@@ -50,12 +50,12 @@ namespace ColdstormD{
     int user::privmsg( int usr, String msg ){
         con->send(":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+nick+" :" + msg+"\r\n" );
         linestyped++;
-        return 1;
+        return ERROR_NONE;
     }
     int user::notice( int usr, String msg ){
         con->send(":"+ColdstormD::users[usr].getmask()+" NOTICE "+nick+" :" + msg+"\r\n" );
         linestyped++;
-        return 1;
+        return ERROR_NONE;
     }
 
 
@@ -65,7 +65,7 @@ namespace ColdstormD{
             if( validatechannelname(room) == 0 ){
                 con->send( ":" + nick + "!user@user ERROR CHANNAME "+room+
                     " :Erroneous Channel Name :"+room+"\r\n");
-                return 0;
+                return ERROR_INVALID;
             }
             for( unsigned int i = 0; i < rooms.size();++i){
                     DEBUG;
@@ -74,7 +74,7 @@ namespace ColdstormD{
 
                         con->send( ":" + nick + "!user@user ERROR PRESENT "+ColdstormD::rooms[rooms[i]].name+
                                  " :Cannot join "+ColdstormD::rooms[rooms[i]].name+" for you are already there\r\n");
-                        return 0;
+                        return ERROR_ALREADYDONE;
                     }
                 }
                 else break;
@@ -90,7 +90,7 @@ namespace ColdstormD{
                             printf("USER: %i\n", r.usershave[j]);
                             con->send( ":" + nick + "!user@user ERROR PRESENT "+ColdstormD::rooms[rooms[i]].name+
                                     " :Cannot join "+ColdstormD::rooms[rooms[i]].name+" for you are already there\r\n");
-                            return 0;
+                            return ERROR_ALREADYDONE;
                         }
                     }
                     break;
@@ -111,7 +111,7 @@ namespace ColdstormD{
                 else {
                     con->send( ":" + nick + "!user@user ERROR BAN "+ColdstormD::rooms[i].name+
                     " :Cannot join "+ColdstormD::rooms[i].name+" for you are banned\r\n");
-                    return -1;
+                    return ERROR_PERMISSION;
                 }
             }
         }
@@ -123,6 +123,8 @@ namespace ColdstormD{
         a.starowner = "";
         a.motdsetby = 0;
         a.motdseton = 0;
+        a.id = ColdstormD::rooms.size();
+        a.accesslink = -1;
         ColdstormD::rooms.push_back( a );
         rooms.push_back( ColdstormD::rooms.size()-1 );
         return ColdstormD::rooms[ColdstormD::rooms.size()-1].adduser(id,ACCESS_SOP);
@@ -132,16 +134,16 @@ namespace ColdstormD{
     int user::inroom( unsigned int roomname ){
         for( unsigned int i = 0; i < rooms.size(); ++i ){
             if( rooms[i] == roomname ){
-                return 1;
+                return true;
             }
         }
-        return 0;
+        return false;
     }
 
     int user::partroom(String room, String message){
         int rm = getroombyname( room );
-        if( rm < 0 ) return 0;
-        if( !inroom( rm ) ) return 0;
+        if( rm < 0 ) return ERROR_NOTFOUND;
+        if( !inroom( rm ) ) return ERROR_INVALID;
         for( unsigned int i = 0; i < rooms.size(); ++i ){
             if( rooms[i] == (unsigned)rm ){
                 rooms.erase(rooms.begin() + i );
@@ -152,7 +154,7 @@ namespace ColdstormD{
         //ColdstormD::rooms[rm].broadcast(id, ":"+getmask()+" PART "+room+" :"+message+"\r\n");
         ColdstormD::rooms[rm].partuser(id);
 
-        return 1;
+        return ERROR_NONE;
     }
 
     int user::quit(String message){
@@ -162,13 +164,22 @@ namespace ColdstormD{
             ColdstormD::rooms[rooms[i]].partuser(id,true);
         }
         online = false;
-        return 1;
+        return ERROR_NONE;
     }
     int user::broadcast(String message){
         DEBUG;
         for( unsigned int i = 0; i < rooms.size(); ++i ){
             ColdstormD::rooms[rooms[i]].broadcast(id, ":"+getmask()+" "+message+"\r\n");
         }
-        return 1;
+        return ERROR_NONE;
+    }
+    int user::extractroom(String room){
+        for(int j = 0; j < rooms.size(); ++j ){
+            if( ColdstormD::rooms[rooms[j]].name.tolower() == room.tolower() ){
+                rooms.erase(rooms.begin()+j);
+                return ERROR_NONE;
+            }
+        }
+        return ERROR_NOTFOUND;
     }
 }

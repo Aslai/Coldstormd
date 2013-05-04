@@ -2,27 +2,27 @@
 
 namespace ColdstormD{
     int validatechannelname(String name){
-        if( name.length() > 20 ) return 0;
-        if( name[0] != '#' ) return 0;
-        if( (signed)(name.find_first_of(" \t\r\n")) >= 0 ) return 0;
-        return 1;
+        if( name.length() > 20 ) return false;
+        if( name[0] != '#' ) return false;
+        if( (signed)(name.find_first_of(" \t\r\n")) >= 0 ) return false;
+        return true;
     }
 
     int validateusername(String name){
         DEBUG;
-        if( name.length() > 20 ) return 0;
+        if( name.length() > 20 ) return false;
         DEBUG;
-        if( (signed)(name.find_first_of(" \t\r\n")) >= 0 ) return 0;
+        if( (signed)(name.find_first_of(" \t\r\n")) >= 0 ) return false;
         DEBUG;
         String beans = "1234567890`-_=|}]{[qwertyuiopasdfghjklzxcvbnm<>,.?/!^*()";
         DEBUG;
         for( unsigned int i = 0; i < name.length(); ++i ){
             DEBUG;
-            if( (signed)(beans.find_first_of(tolower(name[i]))) < (signed)0 ) return 0;
+            if( (signed)(beans.find_first_of(tolower(name[i]))) < (signed)0 ) return false;
             DEBUG;
         }
         DEBUG;
-        return 1;
+        return true;
     }
 
 
@@ -32,7 +32,9 @@ namespace ColdstormD{
     String I(int in){
         int l = snprintf(0, 0, "%i", in);
         String ret;
-        ret.resize( l+1 );
+        ret.reserve( l+1 );
+        ret.resize( l );
+
         snprintf((char*)ret.c_str(), l+1, "%i", in);
         return ret;
     }
@@ -77,9 +79,9 @@ namespace ColdstormD{
                 DEBUG;
             if( guestpasses[i] == pass ){
                 guestpasses.erase( guestpasses.begin() + i );
-                return 1;
+                return true;
             }
         }
-        return 0;
+        return false;
     }
 }

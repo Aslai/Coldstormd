@@ -46,6 +46,13 @@ namespace ColdstormD{
         u.access = 0;
         u.nick = u.name = u.ip = u.color = "";
         users.push_back( u );
+        u.id = 1;
+        u.access = ACCESS_SOP|ACCESS_AOP|ACCESS_HOP|ACCESS_VOP|ACCESS_NONE;
+        u.nick = u.name = servername;
+        u.ip = "Coldstorm";
+        u.color = "FFFFFF";
+        u.country = "CS";
+        users.push_back( u );
 
 
         DEBUG;
@@ -83,6 +90,6 @@ namespace ColdstormD{
         DEBUG;
         socketcleanup();
         onquit();
-        return 0;
+        return ERROR_NONE;
     }
 }

@@ -22,6 +22,19 @@ namespace ColdstormD{
         ACCESS_HOP=2,
         ACCESS_AOP=4,
         ACCESS_SOP=8,
-        ACCESS_BANNED=16
+        ACCESS_BANNED=16,
+        ACCESS_MUTED=32
+    };
+    enum{
+        ERROR_NONE=0,
+        ERROR_ALREADYDONE,
+        ERROR_PARAM,
+        ERROR_PERMISSION,
+        ERROR_NOTFOUND,
+        ERROR_INVALID
+    };
+    enum{
+        USER_NULL=0,
+        USER_SERVER
     };
 }

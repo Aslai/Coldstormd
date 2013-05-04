@@ -2,11 +2,11 @@
 
 namespace ColdstormD{
     int intro(connection& c, String name ){
-        if( c.introd == true ) return 0;
+        if( c.introd == true ) return ERROR_ALREADYDONE;
         c.introd = true;
         c.send( ":"+servername+" 005 "+name+" CHANMODES=b, CHANTYPES=# CHARSET=utf-8 AWAYLEN=10 KICKLEN=256 MAXBANS=200 MAXCHANNELS=60 MAXPARA=32 :are supported by this server\r\n" );
         c.send( ":"+servername+" 005 "+name+" NETWORK=Coldstorm NICKLEN=20 PREFIX=(sohv)~@#+ STATUSMSG=~@#+ TOPICLEN=200 :are supported by this server\r\n" );
-        return 1;
+        return ERROR_NONE;
     }
 
 
@@ -18,11 +18,11 @@ namespace ColdstormD{
         if( chk == "validate"){
             if( args.size() <= 2 ){
                 c.notice( "Usage: /VALIDATE name password" );
-                return 0;
+                return ERROR_PARAM;
             }
             if( validateusername(args[1]) == 0){
                 c.notice( "Erroneous name" );
-                return 0;
+                return ERROR_PARAM;
             }
             int us = getuserbyname( args[1] );
 
@@ -31,18 +31,18 @@ namespace ColdstormD{
                 int v = consumeguestpass( args[2] );
                 if( v == 0 ){
                     c.notice( "That is an invalid username/password combo" );
-                    return 0;
+                    return ERROR_PARAM;
                 }
                 c.state = LOGIN_GUEST;
                 c.notice( "Welcome to Coldstorm, "+args[1]+". Please set your password with /SETPASS [password]" );
                 c.name = args[1];
-                return 0;
+                return ERROR_NONE;
             }
             if( ops.password == args[2] ){
                 if( ops.online != 0 ){
                     c.notice( "You are still logged in!" );
                     ops.con->close();
-                    return 0;
+                    return ERROR_ALREADYDONE;
                 }
                 c.state = LOGIN_FULL;
                 c.notice( "Successfully logged in as "+args[1] );
@@ -66,18 +66,18 @@ namespace ColdstormD{
                         }*/
                     }
                 }
-                return 0;
+                return ERROR_NONE;
             }
             else{
                 c.notice( "That is an invalid username/password combo" );
-                return 0;
+                return ERROR_NONE;
             }
         }
         else{
             c.notice( "Please use /VALIDATE [name] [password]" );
         }
 
-        return 0;
+        return ERROR_NONE;
     }
 
     int onmsgguest( connection& c, vector<String> args ){
@@ -85,11 +85,11 @@ namespace ColdstormD{
         if( chk == "setpass" ){
             if( args.size() <= 1 ){
                 c.notice( "Usage: /SETPASS [password]" );
-                return 0;
+                return ERROR_PARAM;
             }
             if( args[1].length() > 100 ){
                 c.notice( "Please keep your password under 100 characters" );
-                return 0;
+                return ERROR_PARAM;
             }
             user u;
             u.access = ACCESS_NONE;
@@ -124,8 +124,9 @@ namespace ColdstormD{
         }
         else{
             c.notice("Please set your password before doing anything else with /SETPASS [password]");
+            return ERROR_PARAM;
         }
-        return 0;
+        return ERROR_NONE;
     }
 
 
@@ -162,8 +163,7 @@ namespace ColdstormD{
 
         }*/
 
-
-        return 0;
+        return ERROR_NONE;
     }
 
 
@@ -185,7 +185,7 @@ namespace ColdstormD{
             return onmsgfull( c, args );
         }
 
-        return 0;
+        return ERROR_NONE;
     }
 
     int onconnect(connection& c){
@@ -194,9 +194,9 @@ namespace ColdstormD{
     int onconclose(connection& c){
         if( c.usr > 0 ){
             ColdstormD::users[c.usr].quit("Connection reset");
-            return 1;
+            return ERROR_NOTFOUND;
         }
-        return 0;
+        return ERROR_NONE;
     }
 
     void listenfortcp(void*){
