@@ -174,7 +174,7 @@ namespace ColdstormD{
         return ERROR_NONE;
     }
     int user::extractroom(String room){
-        for(int j = 0; j < rooms.size(); ++j ){
+        for(unsigned int j = 0; j < rooms.size(); ++j ){
             if( ColdstormD::rooms[rooms[j]].name.tolower() == room.tolower() ){
                 rooms.erase(rooms.begin()+j);
                 return ERROR_NONE;
