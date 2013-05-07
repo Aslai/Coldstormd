@@ -24,6 +24,7 @@ namespace ColdstormD{
         unsigned int offlinemax;
         uint32_t registered;
         vector<unsigned int> rooms;
+        vector<int> ignores;
         int id;
 
         int inroom(unsigned int roomname);
@@ -40,5 +41,9 @@ namespace ColdstormD{
         int quit( String message );
         int broadcast(String message);
         int flushmessage();
+
+        int ignore( int target );
+        int listen( int target );
+        int ignorelist();
     };
 }

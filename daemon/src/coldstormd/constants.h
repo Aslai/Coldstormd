@@ -23,7 +23,8 @@ namespace ColdstormD{
         ACCESS_AOP=4,
         ACCESS_SOP=8,
         ACCESS_BANNED=16,
-        ACCESS_MUTED=32
+        ACCESS_MUTED=32,
+        ACCESS_ANY=0xFFFFFFF
     };
     enum{
         ERROR_NONE=0,
@@ -36,5 +37,13 @@ namespace ColdstormD{
     enum{
         USER_NULL=0,
         USER_SERVER
+    };
+    enum{
+        OPTION_NONE=0,
+        OPTION_INVITEONLY=1,
+        OPTION_DENYNONE=2,
+        OPTION_DENYVOICE=4,
+        OPTION_DENYHOP=8,
+        OPTION_DENYAOP=16
     };
 }

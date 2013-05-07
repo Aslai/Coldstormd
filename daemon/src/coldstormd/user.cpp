@@ -213,4 +213,26 @@ namespace ColdstormD{
         }
         return ERROR_NONE;
     }
+    int user::ignore( int target ){
+        for( unsigned int i = 0; i < ignores.size(); ++i ){
+            if( ignores[i] == target ) return ERROR_ALREADYDONE;
+        }
+        ignores.push_back( target );
+        con->send( ":"+servername+" NOTICE "+nick+" :You have ignored "+ColdstormD::users[target].nick+"\r\n");
+        return ERROR_NONE;
+    }
+    int user::listen( int target ){
+        for( unsigned int i = 0; i < ignores.size(); ++i ){
+            if( ignores[i] == target ){
+                con->send( ":"+servername+" NOTICE "+nick+" :You have stopped ignoring "+ColdstormD::users[target].nick+"\r\n");
+                ignores.erase(ignores.begin()+i);
+                return ERROR_NONE;
+            }
+        }
+        return ERROR_NOTFOUND;
+    }
+    int user::ignorelist(){
+        return ERROR_NONE;
+    }
+
 }

@@ -22,7 +22,7 @@ Progress
   * MODE -m [user] -> UNMUTE [user]
   * More to be added
  * Implement IP discovery and country lookup
- * Offline messages
+ * Logging
 * Implement oper global commands
  * SERVKICK [user]
  * SERVBAN [time]
@@ -33,6 +33,8 @@ Progress
 * Implement Moderator global commands
  * GUESTPASS
  * SERVMUTE [time]
+ * SERVUNMUTE [time]
+
 * Implement channel level sop commands
  * OPTIONS [mode]
 * Implement channel level operator commands
@@ -47,6 +49,9 @@ Progress
  * SERVBANLIST
  * ECHO [t/f]
  * NAMES [channel]
+ * IGNORE [user]
+ * LISTEN [user]
+ * IGNORELIST
 
 
 ###The following features have been implemented on the server:
@@ -58,6 +63,7 @@ Progress
  * Limit number of sessions per account to one
  * WHOIS
  * MOTD memory
+ * Offline messages
 * Oper global commands
 * Moderator global commands
 * Channel level sop commands
@@ -71,6 +77,7 @@ Progress
  * UNBAN [user]
 * Channel level moderator commands
  * MUTE [user]
+ * UNMUTE [user]
  * INVITE [user]
  * MOTD [motd]
  * STRIP [user]
