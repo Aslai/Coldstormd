@@ -175,14 +175,15 @@ namespace ColdstormD{
         //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
         return ERROR_NONE;
     }
-    int room::partuser(int usr,bool supressmsg){
+    int room::partuser(int usr,bool supressmsg,bool extract){
         for( unsigned int i = 0; i < usershave.size(); ++i ){
                 DEBUG;
             if( usershave[i] == usr ){
                 if( !supressmsg )
                     broadcast(usr, ":" + ColdstormD::users[usr].getmask() + " PART "+name+" :Leaving\r\n", false);
                 usershave.erase( usershave.begin() + i );
-                ColdstormD::users[usr].extractroom(name);
+                if( extract )
+                    ColdstormD::users[usr].extractroom(name);
                 return ERROR_NONE;
             }
         }
@@ -362,7 +363,7 @@ namespace ColdstormD{
         return ERROR_NONE;
     }
     int room::setoptions(int usr, String option, int value){
-        //return ERROR_NONE;
+        return ERROR_NONE;
     }
     int room::strip(int usr, int target){
         int go = 0;

@@ -2,7 +2,7 @@ Progress
 ========
 
 
-###As of Wednesday, May 1, 2013, the following features have yet to be implemented on the server:
+###As of this commit, the following features have yet to be implemented on the server:
 
 * General server things
  * Alias the IRC MODE command to related CSd commands:
@@ -22,6 +22,7 @@ Progress
   * MODE -m [user] -> UNMUTE [user]
   * More to be added
  * Implement IP discovery and country lookup
+ * Offline messages
 * Implement oper global commands
  * SERVKICK [user]
  * SERVBAN [time]
@@ -77,4 +78,3 @@ Progress
 * Channel level user commands
  * JOIN
  * PART
-* Global user commands

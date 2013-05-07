@@ -53,6 +53,7 @@ namespace ColdstormD{
                 c.usr = ops.id;
                 ops.echo = 0;
                 ops.online = 1;
+
                 c.send( ":"+c.ircname+"!user@user.user NICK "+ops.nick+"\r\n" );
                 vector<unsigned int> t = ops.rooms;
                 ops.rooms.clear();
@@ -66,6 +67,7 @@ namespace ColdstormD{
                         }*/
                     }
                 }
+                ops.flushmessage();
                 return ERROR_NONE;
             }
             else{
@@ -105,6 +107,7 @@ namespace ColdstormD{
             u.registered = time(0);
             u.con = &c;
             u.echo = 0;
+            u.offlinemax = 50;
 
             c.usr = u.id;
             c.state = LOGIN_FULL;

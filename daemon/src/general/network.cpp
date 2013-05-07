@@ -30,6 +30,7 @@ unsigned long getip( SOCKET sock ){
 
 void socketcleanup( void ){
     for( unsigned int i = 0; i < bound.size(); ++i ){
+        shutdown(bound[i], SHUT_RDWR);
         closesocket(bound[i]);
     }
 }

@@ -22,7 +22,7 @@ namespace ColdstormD{
         int options;
         int canjoin( int usr );
         int adduser( int usr, int access = ACCESS_NONE, bool forcejoin = true );
-        int partuser( int usr, bool supress = false );
+        int partuser( int usr, bool supress = false, bool extract = true );
         int removeuser( int usr );
         int privmsg( int usr, String msg );
         int notice( int usr, String msg );
