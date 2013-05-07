@@ -34,15 +34,10 @@ Progress
  * SERVMUTE [time]
 * Implement channel level sop commands
  * OPTIONS [mode]
- * SOP [user]
- * OP [user]
 * Implement channel level operator commands
- * STAR [user]
- * MOD [user]
- * UNBAN [user]
+
 * Implement channel level moderator commands
- * STRIP [user]
- * VOICE [user]
+
 * Implement Channel level user commands
  * BANLIST
  * HELP
@@ -65,13 +60,20 @@ Progress
 * Oper global commands
 * Moderator global commands
 * Channel level sop commands
+ * SOP [user]
+ * OP [user]
 * Channel level operator commands
  * KICK [user]
  * BAN [time]
+ * STAR [user]
+ * MOD [user]
+ * UNBAN [user]
 * Channel level moderator commands
  * MUTE [user]
  * INVITE [user]
  * MOTD [motd]
+ * STRIP [user]
+ * VOICE [user]
 * Channel level user commands
  * JOIN
  * PART

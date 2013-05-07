@@ -1,10 +1,11 @@
 #include "database.h"
+#define VERSION_DATABASE 103
 namespace ColdstormD{
     void writedb(String file){
         FILE* f = fopen( file.c_str(), "wb" );
         if( f == 0 ) return;
         fputs( "KASLAIDB", f );
-        uint32_t version = 100;
+        uint32_t version = VERSION_DATABASE;
         fwrite( &version, 1, sizeof(version), f );
 
         uint32_t len = 0;
@@ -29,9 +30,9 @@ namespace ColdstormD{
         buf2[8] = 0;
         buf = buf2;
 
-        if( buf != "KASLAIDB" ){ printf("FAIL (%s): Expected a KASLAIDB file, got %s %i\n", file.c_str(), buf.c_str(), buf.size() ); return; }
+        if( buf != "KASLAIDB" ){ printf("FAIL (%s): Expected a KASLAIDB file, got %s %i\n", file.c_str(), buf.c_str(), buf.size() ); fclose(f); return; }
         int ver = readint( f );
-        if( ver != 100 ) { printf("FAIL (%s): Expected version %i, got %i\n", file.c_str(), 100, ver ); return; }
+        if( ver != VERSION_DATABASE ) { printf("FAIL (%s): Expected version %i, got %i\n", file.c_str(), VERSION_DATABASE, ver ); fclose(f); return; }
     DEBUG;
         uint32_t toread = readint( f );
         DEBUG;

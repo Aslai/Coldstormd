@@ -120,7 +120,7 @@ namespace ColdstormD{
         //a.users.push_back( id );
         //a.accesslist.push_back( ACCESS_SOP );
         a.name = room;
-        a.starowner = "";
+        a.starowner = -1;
         a.motdsetby = 0;
         a.motdseton = 0;
         a.id = ColdstormD::rooms.size();

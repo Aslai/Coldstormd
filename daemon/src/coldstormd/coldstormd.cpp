@@ -20,6 +20,7 @@ namespace ColdstormD{
         functions["kick"].push_back(callbacks::kick);
         functions["mute"].push_back(callbacks::mute);
         functions["mod"].push_back(callbacks::mod);
+        functions["voice"].push_back(callbacks::voice);
         functions["star"].push_back(callbacks::star);
         functions["op"].push_back(callbacks::op);
         functions["sop"].push_back(callbacks::sop);

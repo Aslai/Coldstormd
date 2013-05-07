@@ -11,7 +11,7 @@ namespace ColdstormD{
         int id;
         int accesslink;
         String name;
-        String starowner;
+        int starowner;
         vector<int> users;
         vector<int> accesslist;
         vector<int> usershave;
@@ -19,6 +19,7 @@ namespace ColdstormD{
         vector<String> motdhist;
         int motdsetby;
         int motdseton;
+        int options;
         int canjoin( int usr );
         int adduser( int usr, int access = ACCESS_NONE, bool forcejoin = true );
         int partuser( int usr, bool supress = false );
@@ -33,7 +34,18 @@ namespace ColdstormD{
         int kick(int usr, int target, String reason);
         int ban(int usr, int target, String reason );
         int setaccess(int usr, int target, int access, int requiredaccess);
+        int revokeaccess(int usr, int target, int access, int requiredaccess);
+
         int mute(int usr, int target, String reason );
+        int voice(int usr, int target);
+        int mod(int usr, int target);
+        int op(int usr, int target);
+        int sop(int usr, int target);
+        int star(int usr, int target);
+        int setoptions(int usr, String option, int value);
+        int strip(int usr, int target);
+        int banlist(int usr);
+        int unban(int usr, int target );
 
         void broadcast(int usr, String message, bool supressecho = true);
 

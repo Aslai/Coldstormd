@@ -1,7 +1,30 @@
 #include "coldstormd/cmdcallbacks.h"
 
+
+
 namespace ColdstormD{
     namespace callbacks{
+        /*int domode( connection& c, String room, String Target, String reason = "" ){
+            if( (reason != "" && args.size() < 4)||(reason=="" && args.size()<3) ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].ban(c.usr, us, args[3]) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
+            return ERROR_NONE;
+        }*/
         int ping( connection& c, vector<String> args ){
             if( args.size() < 2 ){
                 c.notice("Insufficient parameters");
@@ -20,6 +43,7 @@ namespace ColdstormD{
             return ERROR_NONE;
         }
         int privmsg( connection& c, vector<String> args ){
+
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
@@ -174,6 +198,20 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].unban(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
             return ERROR_NONE;
         }
         int kick( connection& c, vector<String> args ){
@@ -218,10 +256,46 @@ namespace ColdstormD{
             }
             return ERROR_NONE;
         }
+
+        int voice( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].voice(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
+            return ERROR_NONE;
+        }
         int mod( connection& c, vector<String> args ){
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].mod(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
             }
             return ERROR_NONE;
         }
@@ -230,6 +304,20 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].star(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
             return ERROR_NONE;
         }
         int op( connection& c, vector<String> args ){
@@ -237,12 +325,40 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].op(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
             return ERROR_NONE;
         }
         int sop( connection& c, vector<String> args ){
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].sop(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
             }
             return ERROR_NONE;
         }
@@ -278,6 +394,20 @@ namespace ColdstormD{
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( rm < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].strip(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
             }
             return ERROR_NONE;
         }
@@ -345,4 +475,6 @@ namespace ColdstormD{
             return ERROR_NONE;
         }
     }
+
+
 }
