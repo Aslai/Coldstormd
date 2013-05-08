@@ -10,7 +10,7 @@ namespace ColdstormD{
 #include "ajax/ajaxlistener.h"
 #include "coldstormd/constants.h"
 #include "coldstormd/state.h"
-
+using namespace std;
 
 namespace ColdstormD{
     struct connection{

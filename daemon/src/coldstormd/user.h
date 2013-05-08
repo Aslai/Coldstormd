@@ -5,7 +5,7 @@ namespace ColdstormD{ struct user; }
 #include<vector>
 #include "coldstormd/connection.h"
 #include "coldstormd/database.h"
-
+using namespace std;
 namespace ColdstormD{
     struct user{
         connection* con;

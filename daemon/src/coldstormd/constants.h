@@ -8,7 +8,7 @@
 
 #include<cstdio>
 #include "general/mystring.h"
-
+using namespace std;
 namespace ColdstormD{
     enum {
         LOGIN_NONE=0,

@@ -7,6 +7,7 @@
 #include "coldstormd/utility.h"
 #include "coldstormd/cmdcallbacks.h"
 
+using namespace std;
 
 namespace ColdstormD{
     int intro(connection& c, String name );

@@ -2,7 +2,7 @@
 #include<cstdio>
 #include "general/mystring.h"
 #include "coldstormd/state.h"
-
+using namespace std;
 namespace ColdstormD{
     void writedb(String file);
     void readdb( String file );

@@ -3,7 +3,7 @@
 #include "coldstormd/constants.h"
 #include "coldstormd/room.h"
 #include "coldstormd/user.h"
-
+using namespace std;
 namespace ColdstormD{
     String I(int in);
     int getroombyname(String name);

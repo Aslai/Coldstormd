@@ -4,6 +4,7 @@
 #include "coldstormd/room.h"
 #include "coldstormd/user.h"
 #include<map>
+using namespace std;
 namespace ColdstormD{
     extern vector<room> rooms;
     extern vector<user> users;

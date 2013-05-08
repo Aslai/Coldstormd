@@ -5,7 +5,7 @@ namespace ColdstormD{ struct room; }
 #include<vector>
 #include "coldstormd/database.h"
 #include "coldstormd/utility.h"
-
+using namespace std;
 namespace ColdstormD{
     struct room{
         int id;

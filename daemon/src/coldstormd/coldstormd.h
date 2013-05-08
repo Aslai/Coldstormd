@@ -7,7 +7,7 @@
 #include "coldstormd/state.h"
 #include "coldstormd/cmdcallbacks.h"
 
-
+using namespace std;
 
 namespace ColdstormD{
     int run();

@@ -107,7 +107,7 @@ namespace ColdstormD{
                 if( users[j] == usershave[i] ){
                     switch( accesslist[j] ){
                         case ACCESS_VOP: prep = "+"; break;
-                        case ACCESS_HOP: prep = "#"; break;
+                        case ACCESS_HOP: prep = "%"; break;
                         case ACCESS_AOP: prep = "@"; break;
                         case ACCESS_SOP: prep = "~"; break;
                     }
@@ -130,7 +130,7 @@ namespace ColdstormD{
                 if( users[j] == usershave[i] ){
                     int access = useraccess(users[j]);
                     if( (access & ACCESS_VOP) != 0 )  prep = "+";
-                    if( (access & ACCESS_HOP) != 0 )  prep = "#";
+                    if( (access & ACCESS_HOP) != 0 )  prep = "%";
                     if( (access & ACCESS_AOP) != 0 )  prep = "@";
                     if( (access & ACCESS_SOP) != 0 )  prep = "~";
                 }
@@ -348,7 +348,7 @@ namespace ColdstormD{
         int derp = setaccess( usr, target, ACCESS_SOP|ACCESS_AOP|ACCESS_HOP|ACCESS_VOP, (ACCESS_SOP) );
         if( derp != ERROR_NONE )
             return derp;
-        broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" +a "+ColdstormD::users[target].nick+"\r\n", false );
+        broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" +q "+ColdstormD::users[target].nick+"\r\n", false );
         return ERROR_NONE;
     }
     int room::star(int usr, int target){
@@ -384,7 +384,7 @@ namespace ColdstormD{
         int accesses[4]={ACCESS_VOP,ACCESS_HOP,ACCESS_AOP,ACCESS_SOP};
         for( int i = 0; i < go; ++i ){
             if( (useraccess(target) & accesses[i]) != 0 ){
-                m+=("vhoa")[i];
+                m+=("vhoq")[i];
                 mend += n;
             }
         }

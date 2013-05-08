@@ -6,6 +6,8 @@
 #include "coldstormd/database.h"
 #include "coldstormd/utility.h"
 
+using namespace std;
+
 namespace ColdstormD{
     namespace callbacks{
         int ping( connection& c, vector<String> args);

@@ -5,7 +5,7 @@ namespace ColdstormD{
         if( c.introd == true ) return ERROR_ALREADYDONE;
         c.introd = true;
         c.send( ":"+servername+" 005 "+name+" CHANMODES=b, CHANTYPES=# CHARSET=utf-8 AWAYLEN=10 KICKLEN=256 MAXBANS=200 MAXCHANNELS=60 MAXPARA=32 :are supported by this server\r\n" );
-        c.send( ":"+servername+" 005 "+name+" NETWORK=Coldstorm NICKLEN=20 PREFIX=(sohv)~@#+ STATUSMSG=~@#+ TOPICLEN=200 :are supported by this server\r\n" );
+        c.send( ":"+servername+" 005 "+name+" NETWORK=Coldstorm NICKLEN=20 PREFIX=(qaohv)~&@%+ STATUSMSG=~&@%+ TOPICLEN=200 :are supported by this server\r\n" );
         return ERROR_NONE;
     }
 
