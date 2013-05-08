@@ -2,7 +2,7 @@ Progress
 ========
 
 
-###As of Wednesday, May 1, 2013, the following features have yet to be implemented on the server:
+###As of this commit, the following features have yet to be implemented on the server:
 
 * General server things
  * Alias the IRC MODE command to related CSd commands:
@@ -22,6 +22,7 @@ Progress
   * MODE -m [user] -> UNMUTE [user]
   * More to be added
  * Implement IP discovery and country lookup
+ * Logging
 * Implement oper global commands
  * SERVKICK [user]
  * SERVBAN [time]
@@ -32,6 +33,8 @@ Progress
 * Implement Moderator global commands
  * GUESTPASS
  * SERVMUTE [time]
+ * SERVUNMUTE [time]
+
 * Implement channel level sop commands
  * OPTIONS [mode]
 * Implement channel level operator commands
@@ -46,6 +49,9 @@ Progress
  * SERVBANLIST
  * ECHO [t/f]
  * NAMES [channel]
+ * IGNORE [user]
+ * LISTEN [user]
+ * IGNORELIST
 
 
 ###The following features have been implemented on the server:
@@ -57,6 +63,7 @@ Progress
  * Limit number of sessions per account to one
  * WHOIS
  * MOTD memory
+ * Offline messages
 * Oper global commands
 * Moderator global commands
 * Channel level sop commands
@@ -70,6 +77,7 @@ Progress
  * UNBAN [user]
 * Channel level moderator commands
  * MUTE [user]
+ * UNMUTE [user]
  * INVITE [user]
  * MOTD [motd]
  * STRIP [user]
@@ -77,4 +85,3 @@ Progress
 * Channel level user commands
  * JOIN
  * PART
-* Global user commands

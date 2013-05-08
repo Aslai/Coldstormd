@@ -22,7 +22,7 @@ namespace ColdstormD{
         int options;
         int canjoin( int usr );
         int adduser( int usr, int access = ACCESS_NONE, bool forcejoin = true );
-        int partuser( int usr, bool supress = false );
+        int partuser( int usr, bool supress = false, bool extract = true );
         int removeuser( int usr );
         int privmsg( int usr, String msg );
         int notice( int usr, String msg );
@@ -35,6 +35,7 @@ namespace ColdstormD{
         int ban(int usr, int target, String reason );
         int setaccess(int usr, int target, int access, int requiredaccess);
         int revokeaccess(int usr, int target, int access, int requiredaccess);
+        int haveuser( int usr );
 
         int mute(int usr, int target, String reason );
         int voice(int usr, int target);
@@ -42,7 +43,7 @@ namespace ColdstormD{
         int op(int usr, int target);
         int sop(int usr, int target);
         int star(int usr, int target);
-        int setoptions(int usr, String option, int value);
+        int setoptions(int usr, int option, int value);
         int strip(int usr, int target);
         int banlist(int usr);
         int unban(int usr, int target );

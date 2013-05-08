@@ -11,14 +11,19 @@ namespace ColdstormD{
 
     int user::write( FILE* f ){
         int len = name.write(0) + nick.write(0) + color.write(0) + country.write(0) + ip.write(0) +
-            password.write(0) + writeint(0,access) + writeint(0, online) + writeint(0, id) + writeint(0,linestyped) + writeint(0,registered) + writeint( 0, rooms.size() );
+            password.write(0) + writeint(0,access) + writeint(0, online) + writeint(0, id) + writeint(0,linestyped) + writeint(0,registered) + writeint( 0, rooms.size() ) + writeint( 0, offlinemax ) + writeint( 0, offlinemsgs.size() );
         for( unsigned int i = 0; i < rooms.size(); ++i ) len += writeint( 0, rooms[i] );
+        for( unsigned int i = 0; i < offlinemsgs.size(); ++i ) len +=  offlinemsgs[i].write(0);
+
 
         if( f != 0 ){
             writeint( f, len );
             len = name.write(f) + nick.write(f) + color.write(f) + country.write(f) + ip.write(f) + password.write(f) +
                 writeint(f,access) + writeint(f,online) + writeint(f,id) + writeint(f,linestyped) + writeint(f,registered) + writeint( f, rooms.size() );
             for( unsigned int i = 0; i < rooms.size(); ++i ) len += writeint( f, rooms[i] );
+            writeint( f, offlinemax );
+            writeint( f, offlinemsgs.size() );
+            for( unsigned int i = 0; i < offlinemsgs.size(); ++i ) len +=  offlinemsgs[i].write(f);
         }
         return len + sizeof(len);
     }
@@ -44,12 +49,31 @@ namespace ColdstormD{
             DEBUG;
             rooms.push_back( readint( f ) );
         }
+        offlinemax = readint(f);
+        toread = readint( f );
+        for( unsigned int i = 0; i < toread; ++i ){
+            DEBUG;
+            String t;
+            t.read(f);
+            offlinemsgs.push_back( t );
+        }
         return len + sizeof(len);
     }
 
     int user::privmsg( int usr, String msg ){
-        con->send(":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+nick+" :" + msg+"\r\n" );
-        linestyped++;
+        if( online == false ){
+            if( offlinemsgs.size() < offlinemax ){
+                ColdstormD::users[usr].con->send(":"+servername+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and the message has been queued. They will recieve it when they sign on next.\r\n");
+                offlinemsgs.push_back( ":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+nick+" :"+timestamp()+": "+msg+"\r\n" );
+            }
+            else {
+                ColdstormD::users[usr].con->send(":"+servername+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and their message box is full. Try again later.\r\n");
+
+            }
+            return ERROR_NONE;
+        }
+        con->send(":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+nick+" :" +msg+"\r\n" );
+        //linestyped++;
         return ERROR_NONE;
     }
     int user::notice( int usr, String msg ){
@@ -161,7 +185,7 @@ namespace ColdstormD{
         DEBUG;
         for( unsigned int i = 0; i < rooms.size(); ++i ){
             ColdstormD::rooms[rooms[i]].broadcast(id, ":"+getmask()+" QUIT :"+message+"\r\n");
-            ColdstormD::rooms[rooms[i]].partuser(id,true);
+            ColdstormD::rooms[rooms[i]].partuser(id,true, false);
         }
         online = false;
         return ERROR_NONE;
@@ -182,4 +206,33 @@ namespace ColdstormD{
         }
         return ERROR_NOTFOUND;
     }
+    int user::flushmessage(){
+        while( offlinemsgs.size() > 0 ){
+            con->send(offlinemsgs.front());
+            offlinemsgs.pop_front();
+        }
+        return ERROR_NONE;
+    }
+    int user::ignore( int target ){
+        for( unsigned int i = 0; i < ignores.size(); ++i ){
+            if( ignores[i] == target ) return ERROR_ALREADYDONE;
+        }
+        ignores.push_back( target );
+        con->send( ":"+servername+" NOTICE "+nick+" :You have ignored "+ColdstormD::users[target].nick+"\r\n");
+        return ERROR_NONE;
+    }
+    int user::listen( int target ){
+        for( unsigned int i = 0; i < ignores.size(); ++i ){
+            if( ignores[i] == target ){
+                con->send( ":"+servername+" NOTICE "+nick+" :You have stopped ignoring "+ColdstormD::users[target].nick+"\r\n");
+                ignores.erase(ignores.begin()+i);
+                return ERROR_NONE;
+            }
+        }
+        return ERROR_NOTFOUND;
+    }
+    int user::ignorelist(){
+        return ERROR_NONE;
+    }
+
 }

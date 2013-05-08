@@ -61,14 +61,20 @@ namespace ColdstormD{
                 if( t >= 0 ){
                     printf("sending\n");
                     ret = rooms[t].privmsg(usr, message);
+                    if( ret == ERROR_NONE ){
+                        users[c.usr].linestyped++;
+                    }
                 }
             }
             else{
                     printf("PM to user%s\n", target.c_str() );
                 int t = getuserbynick(target);
                 if( t >= 0 ){
-                        printf("sending\n");
+                    printf("sending\n");
                     ret = users[t].privmsg(usr, message);
+                    if( ret == ERROR_NONE ){
+                        users[c.usr].linestyped++;
+                    }
                 }
             }
             if( ret != ERROR_NONE ){

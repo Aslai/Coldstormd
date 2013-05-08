@@ -175,14 +175,15 @@ namespace ColdstormD{
         //::users[usr].con->send( ":" + ::users[usr].nick + "!user@user JOIN "+name+"\r\n");
         return ERROR_NONE;
     }
-    int room::partuser(int usr,bool supressmsg){
+    int room::partuser(int usr,bool supressmsg,bool extract){
         for( unsigned int i = 0; i < usershave.size(); ++i ){
                 DEBUG;
             if( usershave[i] == usr ){
                 if( !supressmsg )
                     broadcast(usr, ":" + ColdstormD::users[usr].getmask() + " PART "+name+" :Leaving\r\n", false);
                 usershave.erase( usershave.begin() + i );
-                ColdstormD::users[usr].extractroom(name);
+                if( extract )
+                    ColdstormD::users[usr].extractroom(name);
                 return ERROR_NONE;
             }
         }
@@ -199,15 +200,27 @@ namespace ColdstormD{
         }
         return ERROR_NOTFOUND;
     }
-
+    int room::haveuser( int usr ){
+        if( ( useraccess(usr) & (ACCESS_SOP | ACCESS_AOP ) ) != 0 )
+            return true;
+        for( unsigned int i = 0; i < usershave.size(); ++i ){
+            if( usershave[i] == usr )
+                return true;
+        }
+        return false;
+    }
     int room::privmsg( int usr, String msg ){
         if( (useraccess(usr) & ACCESS_MUTED ) != 0 )
+            return ERROR_PERMISSION;
+        if( !haveuser(usr) )
             return ERROR_PERMISSION;
         broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+name+" :" + msg+"\r\n" );
         return ERROR_NONE;
     }
     int room::notice( int usr, String msg ){
         if( (useraccess(usr) & ACCESS_MUTED ) != 0 )
+            return ERROR_PERMISSION;
+        if( !haveuser(usr) )
             return ERROR_PERMISSION;
         broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" NOTICE "+name+" :" + msg+"\r\n" );
         return ERROR_NONE;
@@ -234,6 +247,8 @@ namespace ColdstormD{
         if( ( useraccess(usr) & (ACCESS_HOP|ACCESS_AOP|ACCESS_SOP) ) == 0 ){
             return ERROR_PERMISSION;
         }
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         motd = mo;
         motdhist.push_back(I(time(0))+": "+mo);
         broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" TOPIC "+name+" :"+mo+"\r\n", false);
@@ -243,6 +258,8 @@ namespace ColdstormD{
         if( ( useraccess(usr) & (ACCESS_HOP|ACCESS_AOP|ACCESS_SOP) ) == 0 ){
             return ERROR_PERMISSION;
         }
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         String msg = ":"+ColdstormD::users[usr].getmask()+" INVITE "+ColdstormD::users[target].nick+" "+name+"\r\n";
         broadcast( USER_SERVER, ":"+servername+" NOTICE "+name+" :*** "+ColdstormD::users[usr].nick+" invited "+ColdstormD::users[target].nick+" to "+name+"\r\n" );
         ColdstormD::users[target].con->send(msg);
@@ -253,6 +270,8 @@ namespace ColdstormD{
         if( ( useraccess(usr) & (ACCESS_AOP|ACCESS_SOP) ) == 0 ){
             return ERROR_PERMISSION;
         }
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         int found = -1;
         for( unsigned int i = 0; i < users.size(); ++i ){
             if( users[i] == target ){
@@ -275,6 +294,8 @@ namespace ColdstormD{
         if( ( useraccess(usr) & requiredaccess ) == 0 ){
             return ERROR_PERMISSION;
         }
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         for( unsigned int i = 0; i < users.size(); ++i ){
             if( users[i] == target ){
                 accesslist[i] |= access;
@@ -287,6 +308,8 @@ namespace ColdstormD{
         if( ( useraccess(usr) & requiredaccess ) == 0 ){
             return ERROR_PERMISSION;
         }
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         for( unsigned int i = 0; i < users.size(); ++i ){
             if( users[i] == target ){
                 accesslist[i] &= ~access;
@@ -355,17 +378,30 @@ namespace ColdstormD{
         if( ( useraccess(usr) & (ACCESS_AOP|ACCESS_SOP) ) == 0 ){
             return ERROR_PERMISSION;
         }
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         if( starowner > 0 )
             broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -S "+ColdstormD::users[starowner].nick+"\r\n", false );
         starowner = target;
         broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" +S "+ColdstormD::users[target].nick+"\r\n", false );
         return ERROR_NONE;
     }
-    int room::setoptions(int usr, String option, int value){
-        //return ERROR_NONE;
+    int room::setoptions(int usr, int option, int value){
+        if( ( useraccess(usr) & ACCESS_SOP ) == 0 ){
+            return ERROR_PERMISSION;
+        }
+        if( value == false ){
+            options &= ~option;
+        }
+        else {
+            options |= option;
+        }
+        return ERROR_NONE;
     }
     int room::strip(int usr, int target){
         int go = 0;
+        if( !haveuser(usr) )
+            return ERROR_PERMISSION;
         do{
             if( (useraccess(usr) & ACCESS_SOP) != 0 )
                 { go = 4; break;}
@@ -381,21 +417,27 @@ namespace ColdstormD{
         String n = ColdstormD::users[target].nick+" ";
         String m =  ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -";
         String mend = " ";
-        int accesses[4]={ACCESS_VOP,ACCESS_HOP,ACCESS_AOP,ACCESS_SOP};
+        int accesses[4]={ACCESS_SOP,ACCESS_AOP,ACCESS_HOP,ACCESS_VOP};
         for( int i = 0; i < go; ++i ){
-            if( (useraccess(target) & accesses[i]) != 0 ){
-                m+=("vhoq")[i];
+            if( (useraccess(target) & (accesses[i])) != 0 ){
+                m+=("qohv")[i];
                 mend += n;
             }
         }
         m+=mend+"\r\n";
+        if( mend == " " )
+            return ERROR_INVALID;
         broadcast( usr, m, false );
+        revokeaccess( usr, target, ACCESS_SOP|ACCESS_AOP|ACCESS_HOP|ACCESS_VOP,ACCESS_ANY);
         return ERROR_NONE;
     }
     int room::banlist(int usr){
-        /*for( int i = 0; i < accesslist.size(); ++i ){
-            if( (accesslist[i] & ACCESS_BANNED) )
-        }*/
+        for( unsigned int i = 0; i < accesslist.size(); ++i ){
+            if( (accesslist[i] & ACCESS_BANNED) ){
+                ColdstormD::users[usr].con->send("");
+            }
+        }
+        return ERROR_NONE;
     }
 
 

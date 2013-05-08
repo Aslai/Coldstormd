@@ -84,4 +84,8 @@ namespace ColdstormD{
         }
         return false;
     }
+
+    String timestamp(){
+        return "Time";
+    }
 }

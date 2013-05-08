@@ -5,7 +5,10 @@ namespace ColdstormD{ struct user; }
 #include<vector>
 #include "coldstormd/connection.h"
 #include "coldstormd/database.h"
+#include<deque>
 using namespace std;
+
+
 namespace ColdstormD{
     struct user{
         connection* con;
@@ -19,8 +22,11 @@ namespace ColdstormD{
         int online;
         int linestyped;
         int echo;
+        deque<String> offlinemsgs;
+        unsigned int offlinemax;
         uint32_t registered;
         vector<unsigned int> rooms;
+        vector<int> ignores;
         int id;
 
         int inroom(unsigned int roomname);
@@ -36,5 +42,10 @@ namespace ColdstormD{
         int read( FILE* f );
         int quit( String message );
         int broadcast(String message);
+        int flushmessage();
+
+        int ignore( int target );
+        int listen( int target );
+        int ignorelist();
     };
 }
