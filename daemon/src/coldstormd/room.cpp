@@ -129,10 +129,10 @@ namespace ColdstormD{
             for( unsigned int j = 0; j < users.size(); ++j ){
                 if( users[j] == usershave[i] ){
                     int access = useraccess(users[j]);
-                    if( (access & ACCESS_VOP) != 0 )  prep = "+";
-                    if( (access & ACCESS_HOP) != 0 )  prep = "%";
-                    if( (access & ACCESS_AOP) != 0 )  prep = "@";
-                    if( (access & ACCESS_SOP) != 0 )  prep = "~";
+                    if( (access & ACCESS_VOP) != 0 ) prep = "+";
+                    if( (access & ACCESS_HOP) != 0 ) prep = "%";
+                    if( (access & ACCESS_AOP) != 0 ) prep = "@";
+                    if( (access & ACCESS_SOP) != 0 ) prep = "~";
                 }
             }
             s += prep + ColdstormD::users[usershave[i]].nick+" ";
@@ -344,6 +344,13 @@ namespace ColdstormD{
         broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" +m "+ColdstormD::users[target].nick+" :"+reason+"\r\n", false );
         return ERROR_NONE;
     }
+    int room::unmute(int usr, int target ){
+        int derp = revokeaccess( usr, target, ACCESS_MUTED, (ACCESS_HOP|ACCESS_AOP|ACCESS_SOP) );
+        if( derp != ERROR_NONE )
+            return derp;
+        broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -m "+ColdstormD::users[target].nick+"\r\n", false );
+        return ERROR_NONE;
+    }
 
 
     int room::voice(int usr, int target){
@@ -415,7 +422,7 @@ namespace ColdstormD{
             return ERROR_PERMISSION;
         }
         String n = ColdstormD::users[target].nick+" ";
-        String m =  ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -";
+        String m = ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -";
         String mend = " ";
         int accesses[4]={ACCESS_SOP,ACCESS_AOP,ACCESS_HOP,ACCESS_VOP};
         for( int i = 0; i < go; ++i ){
