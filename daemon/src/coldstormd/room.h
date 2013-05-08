@@ -38,6 +38,8 @@ namespace ColdstormD{
         int haveuser( int usr );
 
         int mute(int usr, int target, String reason );
+        int unmute(int usr, int target );
+
         int voice(int usr, int target);
         int mod(int usr, int target);
         int op(int usr, int target);

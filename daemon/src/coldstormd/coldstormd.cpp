@@ -19,6 +19,8 @@ namespace ColdstormD{
         functions["unban"].push_back(callbacks::unban);
         functions["kick"].push_back(callbacks::kick);
         functions["mute"].push_back(callbacks::mute);
+        functions["unmute"].push_back(callbacks::unmute);
+
         functions["mod"].push_back(callbacks::mod);
         functions["voice"].push_back(callbacks::voice);
         functions["star"].push_back(callbacks::star);
@@ -37,7 +39,11 @@ namespace ColdstormD{
         functions["banlist"].push_back(callbacks::banlist);
         functions["help"].push_back(callbacks::help);
         functions["echo"].push_back(callbacks::echo);
-        functions["names"].push_back(callbacks::names);
+        functions["who"].push_back(callbacks::who);
+        functions["mode"].push_back(callbacks::mode);
+        functions["ignore"].push_back(callbacks::ignore);
+        functions["listen"].push_back(callbacks::listen);
+
 
 
         DEBUG;

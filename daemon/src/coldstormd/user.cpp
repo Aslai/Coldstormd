@@ -59,8 +59,15 @@ namespace ColdstormD{
         }
         return len + sizeof(len);
     }
-
+    int user::isignoring(int usr){
+        for( unsigned int i = 0; i < ignores.size(); ++i ){
+            if( usr == ignores[i] ) return true;
+        }
+        return false;
+    }
     int user::privmsg( int usr, String msg ){
+        if( isignoring(usr) )
+            return ERROR_PERMISSION;
         if( online == false ){
             if( offlinemsgs.size() < offlinemax ){
                 ColdstormD::users[usr].con->send(":"+servername+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and the message has been queued. They will recieve it when they sign on next.\r\n");

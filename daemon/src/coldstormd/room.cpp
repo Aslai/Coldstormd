@@ -344,6 +344,13 @@ namespace ColdstormD{
         broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" +m "+ColdstormD::users[target].nick+" :"+reason+"\r\n", false );
         return ERROR_NONE;
     }
+    int room::unmute(int usr, int target ){
+        int derp = revokeaccess( usr, target, ACCESS_MUTED, (ACCESS_HOP|ACCESS_AOP|ACCESS_SOP) );
+        if( derp != ERROR_NONE )
+            return derp;
+        broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -m "+ColdstormD::users[target].nick+"\r\n", false );
+        return ERROR_NONE;
+    }
 
 
     int room::voice(int usr, int target){

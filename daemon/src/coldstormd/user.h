@@ -47,5 +47,6 @@ namespace ColdstormD{
         int ignore( int target );
         int listen( int target );
         int ignorelist();
+        int isignoring(int);
     };
 }
