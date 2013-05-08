@@ -15,7 +15,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -167,7 +167,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -189,7 +189,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -210,7 +210,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -231,7 +231,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -252,7 +252,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -262,7 +262,27 @@ namespace ColdstormD{
             }
             return ERROR_NONE;
         }
-
+        int unmute( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( us < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].unmute(c.usr, us ) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
+            return ERROR_NONE;
+        }
         int voice( connection& c, vector<String> args ){
             if( args.size() < 3 ){
                 c.notice("Insufficient parameters");
@@ -274,7 +294,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -295,7 +315,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -316,7 +336,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -337,7 +357,7 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
@@ -358,13 +378,162 @@ namespace ColdstormD{
                 return ERROR_NOTFOUND;
             }
             int us = getuserbynick( args[2] );
-            if( rm < 0 ){
+            if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
             if( rooms[rm].sop(c.usr, us) == ERROR_PERMISSION ){
                 c.notice("Insufficient permission");
                 return ERROR_PERMISSION;
+            }
+            return ERROR_NONE;
+        }
+
+
+
+        int strip( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = getuserbynick( args[2] );
+            if( us < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            if( rooms[rm].strip(c.usr, us) == ERROR_PERMISSION ){
+                c.notice("Insufficient permission");
+                return ERROR_PERMISSION;
+            }
+            return ERROR_NONE;
+        }
+
+        int echo( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            if( args[1].tolower() == "true" ){
+                users[c.usr].echo = true;
+            }
+            else if( args[1].tolower() == "false" ){
+                users[c.usr].echo = false;
+            }
+            else return ERROR_PARAM;
+            return ERROR_NONE;
+        }
+
+        int mode( connection& c, vector<String> args ){
+            if( args.size() < 3 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            int us = -5;
+            if( args.size() >= 4 ){
+                us = getuserbynick( args[3] );
+                if( us < 0 ){
+                    c.notice("Unknown user");
+                    return ERROR_NOTFOUND;
+                }
+            }
+            int typ = 1, po = 0;
+            if( args[2][0] == '-' ){
+                typ = -1;
+            }
+            if( args[2][0] == '-' || args[2][0] == '+' ){
+                po = 1;
+            }
+            if( typ == 1 )
+                switch( args[2][po] ){
+                    case 'b':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].ban( c.usr, us, "Bye bye!" );
+                        break;
+                    case 'v':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].voice( c.usr, us );
+                        break;
+                    case 'h':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].mod( c.usr, us );
+                        break;
+                    case 'o':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].op( c.usr, us );
+                        break;
+                    case 'q':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].sop( c.usr, us );
+                        break;
+                    case 'i':
+                        rooms[rm].setoptions( c.usr, OPTION_INVITEONLY, true );
+                        break;
+                    case 'm':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].mute( c.usr, us, "Be quiet" );
+                        break;
+                }
+            if( typ == -1 )
+                switch( args[2][po] ){
+                    case 'b':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].ban( c.usr, us, "Bye bye!" );
+                        break;
+                    case 'v': case 'h': case 'o': case 'q':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].strip( c.usr, us );
+                        break;
+                    case 'i':
+                        rooms[rm].setoptions( c.usr, OPTION_INVITEONLY, false );
+                        break;
+                    case 'm':
+                        if( us == -5 ){c.notice("Insufficient parameters"); return ERROR_PARAM;}
+                        rooms[rm].unmute( c.usr, us );
+                        break;
+                }
+            return ERROR_NONE;
+        }
+
+
+        int ignore( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int us = getuserbynick( args[3] );
+            if( us < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+
+            return users[us].ignore(us);
+        }
+        int listen( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int us = getuserbynick( args[3] );
+            if( us < 0 ){
+                c.notice("Unknown user");
+                return ERROR_NOTFOUND;
+            }
+            return users[us].listen(us);
+        }
+        int who( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
             }
             return ERROR_NONE;
         }
@@ -393,27 +562,6 @@ namespace ColdstormD{
             if( args.size() < 2 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
-            }
-            return ERROR_NONE;
-        }
-        int strip( connection& c, vector<String> args ){
-            if( args.size() < 3 ){
-                c.notice("Insufficient parameters");
-                return ERROR_PARAM;
-            }
-            int rm = getroombyname( args[1] );
-            if( rm < 0 ){
-                c.notice("Invalid room");
-                return ERROR_NOTFOUND;
-            }
-            int us = getuserbynick( args[2] );
-            if( rm < 0 ){
-                c.notice("Unknown user");
-                return ERROR_NOTFOUND;
-            }
-            if( rooms[rm].strip(c.usr, us) == ERROR_PERMISSION ){
-                c.notice("Insufficient permission");
-                return ERROR_PERMISSION;
             }
             return ERROR_NONE;
         }
@@ -461,20 +609,6 @@ namespace ColdstormD{
         }
         int help( connection& c, vector<String> args ){
             if( args.size() < 1 ){
-                c.notice("Insufficient parameters");
-                return ERROR_PARAM;
-            }
-            return ERROR_NONE;
-        }
-        int echo( connection& c, vector<String> args ){
-            if( args.size() < 2 ){
-                c.notice("Insufficient parameters");
-                return ERROR_PARAM;
-            }
-            return ERROR_NONE;
-        }
-        int names( connection& c, vector<String> args ){
-            if( args.size() < 2 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }

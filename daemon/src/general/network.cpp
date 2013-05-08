@@ -2,14 +2,14 @@
 
 static std::vector<SOCKET> bound;
 
-SOCKET bindSocket( int port )
+SOCKET bindSocket( int port, unsigned long addr )
 {
         SOCKET m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (m_socket == 0) {return 0;}
         sockaddr_in service;
 
         service.sin_family = AF_INET;
-        service.sin_addr.s_addr = INADDR_ANY;//inet_addr( ip );
+        service.sin_addr.s_addr = addr;
         service.sin_port = htons( port );
         if (bind(m_socket,(sockaddr*) (&service), sizeof(service)) < 0) {
             //closesocket(m_socket);

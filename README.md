@@ -5,21 +5,7 @@ Progress
 ###As of this commit, the following features have yet to be implemented on the server:
 
 * General server things
- * Alias the IRC MODE command to related CSd commands:
-  * MODE +b [user] -> BAN [user]
-  * MODE +v [user] -> VOICE [user]
-  * MODE +h [user] -> MOD [user]
-  * MODE +o [user] -> OP [user]
-  * MODE +a [user] -> SOP [user]
-  * MODE +i        -> OPTIONS INVITEONLY TRUE
-  * MODE +m [user] -> MUTE [user]
-  * MODE -b [user] -> UNBAN [user]
-  * MODE -v [user] -> STRIP [user]
-  * MODE -h [user] -> STRIP [user]
-  * MODE -o [user] -> STRIP [user]
-  * MODE -a [user] -> STRIP [user]
-  * MODE -i        -> OPTIONS INVITEONLY FALSE
-  * MODE -m [user] -> UNMUTE [user]
+
   * More to be added
  * Implement IP discovery and country lookup
  * Logging
@@ -45,14 +31,12 @@ Progress
  * BANLIST
  * HELP
 * Implement global user commands
- * NICK
  * SERVBANLIST
- * ECHO [t/f]
- * NAMES [channel]
+ * WHO [channel]
  * IGNORE [user]
  * LISTEN [user]
  * IGNORELIST
-
+ * AWAY [msg]
 
 ###The following features have been implemented on the server:
 
@@ -64,6 +48,7 @@ Progress
  * WHOIS
  * MOTD memory
  * Offline messages
+ * Alias the IRC MODE command to related CSd commands:
 * Oper global commands
 * Moderator global commands
 * Channel level sop commands
@@ -85,3 +70,5 @@ Progress
 * Channel level user commands
  * JOIN
  * PART
+ * NICK
+ * ECHO [t/f]

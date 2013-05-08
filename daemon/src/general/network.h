@@ -14,13 +14,14 @@
     #include <netinet/in.h>
     #include <netdb.h>
     #include <unistd.h>
+    #include <arpa/inet.h>
     #define SOCKET int
     #define closesocket(sock) ::close( sock )
 #endif
 #include<vector>
 #include "mystring.h"
 
-SOCKET bindSocket( int port );
+SOCKET bindSocket( int port, unsigned long addr=INADDR_ANY );
 unsigned long getip( SOCKET sock );
 void socketcleanup( void );
 String getipstr(SOCKET sock);

@@ -23,6 +23,8 @@ namespace ColdstormD{
         int unban( connection& c, vector<String> args);
         int kick( connection& c, vector<String> args);
         int mute( connection& c, vector<String> args);
+        int unmute( connection& c, vector<String> args);
+
         int voice( connection& c, vector<String> args);
         int mod( connection& c, vector<String> args);
         int star( connection& c, vector<String> args);
@@ -41,6 +43,11 @@ namespace ColdstormD{
         int banlist( connection& c, vector<String> args);
         int help( connection& c, vector<String> args);
         int echo( connection& c, vector<String> args);
-        int names( connection& c, vector<String> args);
+        int who( connection& c, vector<String> args);
+        int mode( connection& c, vector<String> args);
+        int ignore( connection& c, vector<String> args);
+        int listen( connection& c, vector<String> args);
+
+
     }
 }
