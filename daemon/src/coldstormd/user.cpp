@@ -70,11 +70,11 @@ namespace ColdstormD{
             return ERROR_PERMISSION;
         if( online == false ){
             if( offlinemsgs.size() < offlinemax ){
-                ColdstormD::users[usr].con->send(":"+servername+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and the message has been queued. They will recieve it when they sign on next.\r\n");
+                ColdstormD::users[usr].con->send(":"+alertname+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and the message has been queued. They will recieve it when they sign on next.\r\n");
                 offlinemsgs.push_back( ":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+nick+" :"+timestamp()+": "+msg+"\r\n" );
             }
             else {
-                ColdstormD::users[usr].con->send(":"+servername+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and their message box is full. Try again later.\r\n");
+                ColdstormD::users[usr].con->send(":"+alertname+" NOTICE "+ColdstormD::users[usr].nick+" :That user is offline and their message box is full. Try again later.\r\n");
 
             }
             return ERROR_NONE;
@@ -225,13 +225,13 @@ namespace ColdstormD{
             if( ignores[i] == target ) return ERROR_ALREADYDONE;
         }
         ignores.push_back( target );
-        con->send( ":"+servername+" NOTICE "+nick+" :You have ignored "+ColdstormD::users[target].nick+"\r\n");
+        con->send( ":"+alertname+" NOTICE "+nick+" :You have ignored "+ColdstormD::users[target].nick+"\r\n");
         return ERROR_NONE;
     }
     int user::listen( int target ){
         for( unsigned int i = 0; i < ignores.size(); ++i ){
             if( ignores[i] == target ){
-                con->send( ":"+servername+" NOTICE "+nick+" :You have stopped ignoring "+ColdstormD::users[target].nick+"\r\n");
+                con->send( ":"+alertname+" NOTICE "+nick+" :You have stopped ignoring "+ColdstormD::users[target].nick+"\r\n");
                 ignores.erase(ignores.begin()+i);
                 return ERROR_NONE;
             }
@@ -239,7 +239,33 @@ namespace ColdstormD{
         return ERROR_NOTFOUND;
     }
     int user::ignorelist(){
+        con->send(":"+alertname+" NOTICE "+nick+" :You have ignored:\r\n");
+        for( unsigned int i = 0; i < ignores.size(); ++i ){
+            con->send(":"+alertname+" NOTICE "+nick+" :"+ColdstormD::users[ignores[i]].nick+"\r\n");
+        }
+        con->send(":"+alertname+" NOTICE "+nick+" :End of ignore list\r\n");
         return ERROR_NONE;
     }
-
+    int user::setcolor(String c){
+        if( c.length() != 6 ){
+            return ERROR_PARAM;
+        }
+        c = c.toupper();
+        for( int i = 0; i < 6; ++i ){
+            if( c[i] < '0' ) return ERROR_INVALID;
+            if( c[i] > 'F') return ERROR_INVALID;
+            if( c[i] >'9' && c[i] < 'A' ) return ERROR_INVALID;
+        }
+        color = c;
+        broadcast("COLOR "+c);
+        return ERROR_NONE;
+    }
+    int user::away(String reason){
+        if( reason.length() > 12 ){
+            return ERROR_PARAM;
+        }
+        awayreason = reason;
+        broadcast("AWAY"+(reason!=""?" :"+reason:""));
+        return ERROR_NONE;
+    }
 }

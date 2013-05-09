@@ -18,6 +18,7 @@ namespace ColdstormD{
         String country;
         String ip;
         String password;
+        String awayreason;
         int access;
         int online;
         int linestyped;
@@ -48,5 +49,9 @@ namespace ColdstormD{
         int listen( int target );
         int ignorelist();
         int isignoring(int);
+
+        int setcolor(String c);
+        int away(String reason);
+
     };
 }

@@ -49,6 +49,8 @@ namespace ColdstormD{
         int strip(int usr, int target);
         int banlist(int usr);
         int unban(int usr, int target );
+        int motdhistory(int usr);
+
 
         void broadcast(int usr, String message, bool supressecho = true, bool canignore = false);
 

@@ -159,6 +159,16 @@ namespace ColdstormD{
                     usershave.push_back(usr);
                     DEBUG;
                     broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" JOIN "+name+"\r\n", false);
+                    int u = useraccess(usr);
+                    int av[] = { ACCESS_SOP, ACCESS_AOP, ACCESS_HOP, ACCESS_VOP };
+                    char ac[] = "qohv";
+                    for( unsigned int i = 0; i < sizeof(av)/sizeof(av[0]); ++i ){
+                        if( ( u & av[i] ) != 0 ){
+                            broadcast(usr, ":"+servername+" MODE "+name+" +"+ac[i]+" "+ColdstormD::users[usr].nick+"\r\n", false);
+                            break;
+                        }
+                    }
+
                     sendinfo(usr);
                 }
                 return ERROR_NONE;
@@ -445,6 +455,12 @@ namespace ColdstormD{
             if( (accesslist[i] & ACCESS_BANNED) ){
                 ColdstormD::users[usr].con->send("");
             }
+        }
+        return ERROR_NONE;
+    }
+    int room::motdhistory(int usr){
+        for( unsigned int i = 0; i < motdhist.size(); ++i ){
+            ColdstormD::users[usr].con->notice(motdhist[i]);
         }
         return ERROR_NONE;
     }

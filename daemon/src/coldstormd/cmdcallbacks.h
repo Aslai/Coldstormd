@@ -47,6 +47,10 @@ namespace ColdstormD{
         int mode( connection& c, vector<String> args);
         int ignore( connection& c, vector<String> args);
         int listen( connection& c, vector<String> args);
+        int color( connection& c, vector<String> args);
+        int ignorelist( connection& c, vector<String> args);
+        int away( connection& c, vector<String> args);
+        int motdhistory( connection& c, vector<String> args);
 
 
     }

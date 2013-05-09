@@ -79,7 +79,7 @@ namespace ColdstormD{
             }
             if( ret != ERROR_NONE ){
                 if( ret == ERROR_PERMISSION ){
-                    c.send( ":"+servername+" NOTICE "+users[c.usr].nick+" :"+target+" had you blocked, and will not receive your message\r\n");
+                    c.send( ":"+alertname+" NOTICE "+users[c.usr].nick+" :"+target+" had you blocked, and will not receive your message\r\n");
                 }
             }
             //::users[usr].con->send("PONG :"+message+"\r\n");
@@ -530,13 +530,57 @@ namespace ColdstormD{
             }
             return users[c.usr].listen(us);
         }
+
+        int color( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            return users[c.usr].setcolor(args[1]);
+        }
+        int away( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            return users[c.usr].away(args[1]);
+        }
+        int ignorelist( connection& c, vector<String> args ){
+            if( args.size() < 1 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            return users[c.usr].ignorelist();
+        }
+
+
         int who( connection& c, vector<String> args ){
             if( args.size() < 2 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
-            return ERROR_NONE;
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            return rooms[rm].sendinfo(c.usr);
         }
+
+
+        int motdhistory( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+            return rooms[rm].motdhistory(c.usr);
+        }
+
         int options( connection& c, vector<String> args ){
             if( args.size() < 4 ){
                 c.notice("Insufficient parameters");

@@ -1,6 +1,18 @@
 #include "coldstormd.h"
 namespace ColdstormD{
+    String guestpass(){
+        srand(time(0));
+        String ret = "GUEST-";
+        char index[]="1234567890qwertyuiopASDFGHJKLZXCVBNMzxcvbnmQWERTYUIOPasdfghjkl";
+        for( int i = ret.length(); i < 20; ++i ){
+            ret += index[rand() % (sizeof(index)/sizeof(index[0]))];
+        }
+        return ret;
+    }
+
     int run(){
+
+
         #ifdef _WIN32
         WSADATA globalWSAData;
         WSAStartup( MAKEWORD(2, 2), &globalWSAData );
@@ -20,7 +32,6 @@ namespace ColdstormD{
         functions["kick"].push_back(callbacks::kick);
         functions["mute"].push_back(callbacks::mute);
         functions["unmute"].push_back(callbacks::unmute);
-
         functions["mod"].push_back(callbacks::mod);
         functions["voice"].push_back(callbacks::voice);
         functions["star"].push_back(callbacks::star);
@@ -43,6 +54,17 @@ namespace ColdstormD{
         functions["mode"].push_back(callbacks::mode);
         functions["ignore"].push_back(callbacks::ignore);
         functions["listen"].push_back(callbacks::listen);
+        functions["ignorelist"].push_back(callbacks::ignorelist);
+        functions["color"].push_back(callbacks::color);
+        functions["away"].push_back(callbacks::away);
+        functions["motdhistory"].push_back(callbacks::motdhistory);
+        functions["topic"].push_back(callbacks::motd);
+        //functions[""].push_back(callbacks::);
+        //functions[""].push_back(callbacks::);
+        //functions[""].push_back(callbacks::);
+        //functions[""].push_back(callbacks::);
+        //functions[""].push_back(callbacks::);
+
 
 
 
@@ -60,6 +82,7 @@ namespace ColdstormD{
         u.color = "FFFFFF";
         u.country = "CS";
         users.push_back( u );
+        frist = users.size();
 
 
         DEBUG;

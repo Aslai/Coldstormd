@@ -2,7 +2,7 @@
 
 namespace ColdstormD{
     void connection::notice(String text){
-        send( ":" + servername + " NOTICE USER :"+text+"\r\n" );
+        send( ":" + alertname + " NOTICE USER :"+text+"\r\n" );
     }
     connectionajax::connectionajax(){
         sendbuf = "";

@@ -114,6 +114,10 @@ namespace ColdstormD{
             c.notice("You have set your password to " + args[1] +". Don't forget it!");
             DEBUG;
             c.send( ":"+c.ircname+"!user@user.user NICK "+u.nick+"\r\n" );
+            if( users.size() == frist ){
+                u.access |= ACCESS_SOP | ACCESS_HOP | ACCESS_AOP | ACCESS_VOP;
+                c.notice("You are the first registered user on the server, so you are the server admin.");
+            }
             users.push_back( u );
 
             DEBUG;

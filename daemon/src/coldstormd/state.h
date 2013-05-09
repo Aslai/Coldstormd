@@ -10,5 +10,7 @@ namespace ColdstormD{
     extern vector<user> users;
     extern vector<String> guestpasses;
     extern String servername;
+    extern String alertname;
+    extern unsigned int frist;
     extern map<String, vector<int(*)(connection&,vector<String>)> > functions;
 }

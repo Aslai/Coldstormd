@@ -5,10 +5,10 @@ Progress
 ###As of this commit, the following features have yet to be implemented on the server:
 
 * General server things
-
-  * More to be added
  * Implement IP discovery and country lookup
  * Logging
+ * Proper timestamp generation
+ * Acquisition of local time zone
 * Implement oper global commands
  * SERVKICK [user]
  * SERVBAN [time]
@@ -20,22 +20,16 @@ Progress
  * GUESTPASS
  * SERVMUTE [time]
  * SERVUNMUTE [time]
-
 * Implement channel level sop commands
  * OPTIONS [mode]
 * Implement channel level operator commands
-
 * Implement channel level moderator commands
-
 * Implement Channel level user commands
  * BANLIST
  * HELP
 * Implement global user commands
  * SERVBANLIST
- * WHO [channel]
- * IGNORELIST
- * AWAY [msg]
- * COLOR
+
 
 
 ###The following features have been implemented on the server:
@@ -70,8 +64,13 @@ Progress
 * Channel level user commands
  * JOIN
  * PART
+ * WHO [channel]
+ * MOTDHISTORY
 * Global user commands
  * NICK
  * ECHO [t/f]
  * IGNORE [user]
  * LISTEN [user]
+ * IGNORELIST
+ * AWAY [msg]
+ * COLOR

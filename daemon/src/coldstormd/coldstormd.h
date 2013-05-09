@@ -10,5 +10,6 @@
 using namespace std;
 
 namespace ColdstormD{
+    String guestpass();
     int run();
 }
