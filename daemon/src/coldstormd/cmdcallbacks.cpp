@@ -79,7 +79,7 @@ namespace ColdstormD{
             }
             if( ret != ERROR_NONE ){
                 if( ret == ERROR_PERMISSION ){
-                    c.send( ":"+servername+" NOTICE "+users[c.usr].nick+" :You are muted on channel "+target+"\r\n");
+                    c.send( ":"+servername+" NOTICE "+users[c.usr].nick+" :"+target+" had you blocked, and will not receive your message\r\n");
                 }
             }
             //::users[usr].con->send("PONG :"+message+"\r\n");
@@ -510,25 +510,25 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
-            int us = getuserbynick( args[3] );
+            int us = getuserbynick( args[1] );
             if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
 
-            return users[us].ignore(us);
+            return users[c.usr].ignore(us);
         }
         int listen( connection& c, vector<String> args ){
             if( args.size() < 2 ){
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
-            int us = getuserbynick( args[3] );
+            int us = getuserbynick( args[1] );
             if( us < 0 ){
                 c.notice("Unknown user");
                 return ERROR_NOTFOUND;
             }
-            return users[us].listen(us);
+            return users[c.usr].listen(us);
         }
         int who( connection& c, vector<String> args ){
             if( args.size() < 2 ){

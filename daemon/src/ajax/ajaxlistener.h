@@ -8,6 +8,9 @@ struct ajaxlistener;
 #include<string.h>
 #include<time.h>
 #ifdef _WIN32
+    #ifndef WINVER
+    #define WINVER 0xFFFF
+    #endif
     #include <windows.h>
     #include <winsock2.h>
     #include <ws2tcpip.h>

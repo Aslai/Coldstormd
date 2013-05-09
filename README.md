@@ -33,10 +33,10 @@ Progress
 * Implement global user commands
  * SERVBANLIST
  * WHO [channel]
- * IGNORE [user]
- * LISTEN [user]
  * IGNORELIST
  * AWAY [msg]
+ * COLOR
+
 
 ###The following features have been implemented on the server:
 
@@ -70,5 +70,8 @@ Progress
 * Channel level user commands
  * JOIN
  * PART
+* Global user commands
  * NICK
  * ECHO [t/f]
+ * IGNORE [user]
+ * LISTEN [user]

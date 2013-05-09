@@ -4,10 +4,15 @@
 
 #include<ctype.h>
 #ifdef _WIN32
+    #ifndef WINVER
+    #define WINVER 0xFFFF
+    #endif
     #include <windows.h>
     #include <winsock2.h>
     #include <ws2tcpip.h>
+    //#define inet_ntop InetNtopA
     #define MSG_NOSIGNAL 0
+    #define SHUT_RDWR 2
 #else
     #include <sys/types.h>
     #include <sys/socket.h>

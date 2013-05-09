@@ -37,12 +37,29 @@ void socketcleanup( void ){
 
 String getipstr(SOCKET sock){
     //TODO: Implement
-    sock *= 2;
-    return "192.168.1.1";
+    char buf[2048];
+    sockaddr_in client_info;
+    socklen_t p = sizeof(client_info);
+    getpeername(sock, (sockaddr*)&client_info, &p);
+
+    #ifdef _WIN32
+        unsigned long int siz =  sizeof(client_info);
+        unsigned long int siz2 = 2048;
+
+        WSAAddressToString((sockaddr*)&client_info,siz, 0, buf, &siz2 );
+
+    #else
+        sockaddr_in* sin = &client_info;
+        inet_ntop(sin->sin_family, &sin->sin_addr, buf, sizeof(buf));
+    #endif
+
+    String r = buf;
+    return r;
 }
 
 String getcountrycode(SOCKET sock){
     //TODO: Implement
+    //http://www.geoplugin.net/json.gp?ip=dottedip
     sock *= 2;
     return "US";
 }

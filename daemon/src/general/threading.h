@@ -1,8 +1,9 @@
 #pragma once
 #ifdef _WIN32
-    #include <windows.h>
-    #include <winsock2.h>
-    #include <ws2tcpip.h>
+    #ifndef WINVER
+    #define WINVER 0xFFFF
+    #endif
+    #include<windows.h>
     #include<process.h>
     #define socklen_t int
     typedef HANDLE mutex;

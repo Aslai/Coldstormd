@@ -50,7 +50,7 @@ namespace ColdstormD{
         int banlist(int usr);
         int unban(int usr, int target );
 
-        void broadcast(int usr, String message, bool supressecho = true);
+        void broadcast(int usr, String message, bool supressecho = true, bool canignore = false);
 
         int write( FILE* f );
         int read( FILE* f );

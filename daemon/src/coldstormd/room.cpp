@@ -79,13 +79,14 @@ namespace ColdstormD{
         return len + sizeof(len);
     }
 
-    void room::broadcast(int usr, String message, bool supressecho){
+    void room::broadcast(int usr, String message, bool supressecho,bool canignore){
         printf("ba\n");
         for( unsigned int i = 0; i < usershave.size(); ++i ){
             if( supressecho )
                 if( usershave[i] == usr && ColdstormD::users[usershave[i]].echo == false ) continue;
             printf("Broadcast from %s to %s\n", name.c_str(), ColdstormD::users[usershave[i]].nick.c_str() );
-            ColdstormD::users[usershave[i]].con->send(message);
+            if( !canignore || (canignore && !ColdstormD::users[usershave[i]].isignoring(usr) ) )
+                ColdstormD::users[usershave[i]].con->send(message);
         }
     }
     int room::canjoin( int usr ){
@@ -214,7 +215,8 @@ namespace ColdstormD{
             return ERROR_PERMISSION;
         if( !haveuser(usr) )
             return ERROR_PERMISSION;
-        broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+name+" :" + msg+"\r\n" );
+
+        broadcast(usr, ":"+ColdstormD::users[usr].getmask()+" PRIVMSG "+name+" :" + msg+"\r\n", true, true );
         return ERROR_NONE;
     }
     int room::notice( int usr, String msg ){
@@ -342,13 +344,6 @@ namespace ColdstormD{
         if( derp != ERROR_NONE )
             return derp;
         broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" +m "+ColdstormD::users[target].nick+" :"+reason+"\r\n", false );
-        return ERROR_NONE;
-    }
-    int room::unmute(int usr, int target ){
-        int derp = revokeaccess( usr, target, ACCESS_MUTED, (ACCESS_HOP|ACCESS_AOP|ACCESS_SOP) );
-        if( derp != ERROR_NONE )
-            return derp;
-        broadcast( usr, ":"+ColdstormD::users[usr].getmask()+" MODE "+name+" -m "+ColdstormD::users[target].nick+"\r\n", false );
         return ERROR_NONE;
     }
     int room::unmute(int usr, int target ){
