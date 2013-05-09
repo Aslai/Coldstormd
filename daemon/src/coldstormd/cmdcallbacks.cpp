@@ -581,6 +581,19 @@ namespace ColdstormD{
             return rooms[rm].motdhistory(c.usr);
         }
 
+        int timezone( connection& c, vector<String> args ){
+            if( args.size() < 2 ){
+                c.notice("Insufficient parameters");
+                return ERROR_PARAM;
+            }
+            if( users[c.usr].settimeoffset(args[1]) != ERROR_NONE ){
+                c.notice("Invalid time");
+                return ERROR_PARAM;
+            }
+            return ERROR_NONE;
+        }
+
+
         int options( connection& c, vector<String> args ){
             if( args.size() < 4 ){
                 c.notice("Insufficient parameters");

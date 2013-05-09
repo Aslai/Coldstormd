@@ -1,5 +1,5 @@
 #include "database.h"
-#define VERSION_DATABASE 104
+#define VERSION_DATABASE 106
 namespace ColdstormD{
     void writedb(String file){
         FILE* f = fopen( file.c_str(), "wb" );

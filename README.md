@@ -21,7 +21,6 @@ Progress
  * SERVMUTE [time]
  * SERVUNMUTE [time]
 * Implement channel level sop commands
- * OPTIONS [mode]
 * Implement channel level operator commands
 * Implement channel level moderator commands
 * Implement Channel level user commands

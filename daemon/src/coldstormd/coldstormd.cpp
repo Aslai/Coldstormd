@@ -59,7 +59,7 @@ namespace ColdstormD{
         functions["away"].push_back(callbacks::away);
         functions["motdhistory"].push_back(callbacks::motdhistory);
         functions["topic"].push_back(callbacks::motd);
-        //functions[""].push_back(callbacks::);
+        functions["timezone"].push_back(callbacks::timezone);
         //functions[""].push_back(callbacks::);
         //functions[""].push_back(callbacks::);
         //functions[""].push_back(callbacks::);

@@ -31,3 +31,6 @@ unsigned long getip( SOCKET sock );
 void socketcleanup( void );
 String getipstr(SOCKET sock);
 String getcountrycode(SOCKET sock);
+unsigned long resolveAddr( const char* addr, int ind=-1 );
+SOCKET connectTCP( unsigned long ip, short int port );
+String request(String);

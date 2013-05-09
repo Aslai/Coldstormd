@@ -29,6 +29,7 @@ namespace ColdstormD{
         vector<unsigned int> rooms;
         vector<int> ignores;
         int id;
+        int timeoffset;
 
         int inroom(unsigned int roomname);
 
@@ -52,6 +53,7 @@ namespace ColdstormD{
 
         int setcolor(String c);
         int away(String reason);
+        int settimeoffset(String off);
 
     };
 }

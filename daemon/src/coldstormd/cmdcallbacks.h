@@ -51,6 +51,7 @@ namespace ColdstormD{
         int ignorelist( connection& c, vector<String> args);
         int away( connection& c, vector<String> args);
         int motdhistory( connection& c, vector<String> args);
+        int timezone( connection& c, vector<String> args);
 
 
     }

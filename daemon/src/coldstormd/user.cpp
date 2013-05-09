@@ -11,25 +11,31 @@ namespace ColdstormD{
 
     int user::write( FILE* f ){
         int len = name.write(0) + nick.write(0) + color.write(0) + country.write(0) + ip.write(0) +
-            password.write(0) + writeint(0,access) + writeint(0, online) + writeint(0, id) + writeint(0,linestyped) + writeint(0,registered) + writeint( 0, rooms.size() ) + writeint( 0, offlinemax ) + writeint( 0, offlinemsgs.size() );
+            password.write(0) + writeint(0,access) + writeint(0, online) + writeint(0, id) +
+            writeint(0,linestyped) + writeint(0,registered) + writeint( 0, rooms.size() ) +
+            writeint( 0, offlinemax ) + writeint( 0, offlinemsgs.size() ) + writeint( 0, timeoffset );
+
         for( unsigned int i = 0; i < rooms.size(); ++i ) len += writeint( 0, rooms[i] );
         for( unsigned int i = 0; i < offlinemsgs.size(); ++i ) len +=  offlinemsgs[i].write(0);
 
 
         if( f != 0 ){
             writeint( f, len );
+            writeint( f, timeoffset );
             len = name.write(f) + nick.write(f) + color.write(f) + country.write(f) + ip.write(f) + password.write(f) +
                 writeint(f,access) + writeint(f,online) + writeint(f,id) + writeint(f,linestyped) + writeint(f,registered) + writeint( f, rooms.size() );
             for( unsigned int i = 0; i < rooms.size(); ++i ) len += writeint( f, rooms[i] );
             writeint( f, offlinemax );
             writeint( f, offlinemsgs.size() );
             for( unsigned int i = 0; i < offlinemsgs.size(); ++i ) len +=  offlinemsgs[i].write(f);
+
         }
         return len + sizeof(len);
     }
     int user::read( FILE* f ){
         uint32_t len;
         fread( &len, 1, 4, f );
+        timeoffset = readint(f);
         name.read(f);
         nick.read(f);
         color.read(f);
@@ -266,6 +272,45 @@ namespace ColdstormD{
         }
         awayreason = reason;
         broadcast("AWAY"+(reason!=""?" :"+reason:""));
+        return ERROR_NONE;
+    }
+    int user::settimeoffset(String off){
+        int mode=1;
+        if( off[0] == '+' ){
+            off = off.substr(1);
+        }
+        else if( off[0] == '-' ){
+            mode=-1;
+            off = off.substr(1);
+        }
+        if( off.length() < 3 || off.length() > 4 ){
+            return ERROR_PARAM;
+        }
+        for( unsigned int i = 0; i < off.length(); ++i){
+            if( off[i] < '0' || off[i] > '9' ){
+                return ERROR_PARAM;
+            }
+        }
+        int hour, minute;
+        if( off.length() == 4 ){
+            if( (off[0] == '2' && off[1] > '3') || off[0] > '2' || off[2] > '5' ) {
+                return ERROR_PARAM;
+            }
+            hour = 10*(off[0]-'0')+(off[1]-'0');
+            minute = 10*(off[2]-'0')+(off[3]-'0');
+
+        }
+        else{
+            if( off[1] > '5' ) {
+                return ERROR_PARAM;
+            }
+            hour = (off[1]-'0');
+            minute = 10*(off[1]-'0')+(off[2]-'0');
+        }
+        minute += 60*hour;
+        minute *= 60;
+        timeoffset = minute * mode;
+        con->notice("You have successfully set your timezone to "+off);
         return ERROR_NONE;
     }
 }

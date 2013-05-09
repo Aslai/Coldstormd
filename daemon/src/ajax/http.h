@@ -25,4 +25,3 @@ int sendbuf(SOCKET sock, const char* data, unsigned int lenn );
 int sendhttppoll(SOCKET sock);
 int sendhttp( SOCKET sock, int status, String contenttype, String value );
 int servefile( SOCKET sock, String name, int status=200, String contenttype = "text/html" );
-
