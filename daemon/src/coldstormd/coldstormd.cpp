@@ -9,6 +9,12 @@ namespace ColdstormD{
         }
         return ret;
     }
+    void flushthread(void*){
+        while( true ){
+            Sleep(1);
+            queued::flush(callbacktcp);
+        }
+    }
 
     int run(){
 
@@ -104,7 +110,7 @@ namespace ColdstormD{
 
 
         DEBUG;
-
+        call_thread( flushthread, 0 );
 
         call_thread( listenfortcp, 0 );
 
