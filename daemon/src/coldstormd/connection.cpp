@@ -15,6 +15,7 @@ namespace ColdstormD{
         onquit = 0;
         onconnect = 0;
         closed = 0;
+        usr = 0;
     }
     int connectionajax::send( String data ){
         mutex_lock(locked);
@@ -89,6 +90,8 @@ namespace ColdstormD{
         onquit = 0;
         onconnect = 0;
         closed = 0;
+        usr = 0;
+
     }
     int connectiontcp::send( String data ){
         char* tmp = (char*)data.c_str();

@@ -77,8 +77,10 @@ int ajaxlistener::remove(String cookie){
     ajaxconnection* c = connections[cookie];
     if( c != 0 ){
         //delete c;
+        sendhttp( c->polling, 404, "text/html", "Connection Closed" );
         connections[cookie]=0;
         ret = 1;
+
     }
     return ret;
 }
