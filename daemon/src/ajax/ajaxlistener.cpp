@@ -41,10 +41,10 @@ void ajaxlistener::docallback( ajaxconnection* c, void* d ){
 }
 
 void ajaxlistener::ajaxconnection::lock(){
-    mutex_lock(locked);
+    //mutex_lock(locked);
 }
 void ajaxlistener::ajaxconnection::unlock(){
-    mutex_unlock(locked);
+    //mutex_unlock(locked);
 }
 
 
@@ -149,7 +149,6 @@ String ajaxlistener::generatecookie(SOCKET sock){
             ret += lookup[t & 0xF];
             ret += lookup[(t>>4) & 0xF];
         }
-        return "A";
         return ret;
     }
 

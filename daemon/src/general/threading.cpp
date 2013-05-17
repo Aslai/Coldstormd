@@ -27,13 +27,15 @@ thread call_thread( void(*func)(void*), void* args )
     return pthread_create(&iThreadId, NULL, (void*(*)(void*))func, args);
 }
 static mutex initmutex = PTHREAD_MUTEX_INITIALIZER;
-mutex mutex_create(){
-    return initmutex;
+mutex& mutex_create(){
+    mutex* a = new mutex();
+    pthread_mutex_init(&(a->m),0);
+    return *a;
 }
 void mutex_lock(mutex& m){
-    pthread_mutex_lock( &m );
+    pthread_mutex_lock( &(m.m) );
 }
 void mutex_unlock(mutex& m){
-    pthread_mutex_unlock( &m );
+    pthread_mutex_unlock( &(m.m) );
 }
 #endif

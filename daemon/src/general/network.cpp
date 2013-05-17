@@ -34,15 +34,18 @@ String request(String url){
     if( url.tolower().substr(0, 7) == "http://" ){
         url = url.substr(7);
     }
-    String addr = url.substr(0, url.indexof("/")-1 );
+    String addr = url.substr(0, url.indexof("/") );
     int port = 80;
     addr = addr.split(":")[0];
-    String git = url.substr(url.indexof("/")+1);
+    String git = url.substr(url.indexof("/"));
     String snd =    "GET "+git+" HTTP/1.1\r\n"+
                     "Host: "+addr+"\r\n\r\n";
     SOCKET s = connectTCP( resolveAddr(addr.c_str()), port);
     sendstr( s, snd );
     String v = readsock( s );
+    //v = readsock( s );
+
+    printf("%s\n\n%s\n",snd.c_str(), v.c_str() );
     return v.substr(v.indexof("\r\n\r\n")+4);
 
 }
@@ -105,12 +108,16 @@ String getipstr(SOCKET sock){
 String getcountrycode(SOCKET sock){
     //TODO: Implement
     //http://www.geoplugin.net/json.gp?ip=dottedip
-    /*String r =request( "http://www.geoplugin.net/json.gp?ip=" + getipstr(sock) ).tolower();
-    int p = r.indexof("countrycode");
+    String r =request( "http://www.geoplugin.net/json.gp?ip=" + getipstr(sock).split(":")[0] ).tolower();
+    int p = r.indexof("geoplugin_countryCode");
     if( p > 0 ){
-        r.indexof("\"", p);
-    }*/
-    return "US";
+        String a = r.substr(r.indexof(":\"", p)+2, 2);
+        printf("\r\n\r\n%s\r\n", a.c_str() );
+        if( a[0] == '"' )
+            return "A2";
+        return a.toupper();
+    }
+    return "A3";
 }
 
 
@@ -131,7 +138,7 @@ SOCKET connectTCP( unsigned long ip, short int port )
 {
     SOCKET ret;
     ret = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if( ret < 0 ) return 0;
+    if( ret <= 0 ) return 0;
     sockaddr_in clientService;
     clientService.sin_family = AF_INET;
     clientService.sin_addr.s_addr = ip;

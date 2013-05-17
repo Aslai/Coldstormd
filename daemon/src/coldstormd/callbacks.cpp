@@ -210,14 +210,14 @@ namespace ColdstormD{
 
         DEBUG;
         connectiontcp con;
-        con.listen( 6667, callbacktcp, onconnect, onconclose );
+        con.listen( 5001, callbacktcp, onconnect, onconclose );
     }
     void listenforajax(void*){
 
         DEBUG;
         connectionajax con;
         con.onconnect = onconnect;
-        con.listen(6666, callbacktcp, onconnect, onconclose);
+        con.listen(5000, callbacktcp, onconnect, onconclose);
     }
 
     void onquit(void){

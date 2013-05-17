@@ -11,13 +11,21 @@
 #else
 
     #include <pthread.h>
-    typedef pthread_mutex_t mutex;
+    //typedef pthread_mutex_t mutex;
     typedef int thread;
+    struct mutex{
+        pthread_mutex_t m;
+    };
 #endif
 
 
 thread call_thread( void(*func)(void*), void* args );
-mutex mutex_create();
+
+mutex
+#ifndef _WIN32
+&
+#endif
+mutex_create();
 void mutex_lock(mutex& m);
 void mutex_unlock(mutex& m);
 

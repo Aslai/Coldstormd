@@ -21,7 +21,7 @@
     #include <unistd.h>
     #include <arpa/inet.h>
     #define SOCKET int
-    #define closesocket(sock) ::close( sock )
+    #define closesocket(sock) {shutdown(sock,SHUT_RDWR); ::close( sock );}
 #endif
 #include<vector>
 #include "mystring.h"

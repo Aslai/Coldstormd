@@ -24,7 +24,6 @@ Progress
 * Implement channel level operator commands
 * Implement channel level moderator commands
 * Implement Channel level user commands
- * BANLIST
  * HELP
 * Implement global user commands
  * SERVBANLIST
@@ -65,6 +64,7 @@ Progress
  * PART
  * WHO [channel]
  * MOTDHISTORY
+ * BANLIST
 * Global user commands
  * NICK
  * ECHO [t/f]

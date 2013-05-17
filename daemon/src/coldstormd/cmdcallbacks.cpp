@@ -98,7 +98,7 @@ namespace ColdstormD{
             for( unsigned int i = 0; i < users.size(); ++i ){
                 if( message.tolower() == users[i].nick.tolower() ){
                     found = 1;
-                    users[usr].con->send(":"+servername+" 311 "+users[usr].nick+" "+message+" "+users[usr].color+" "+users[usr].ip+" * :"+users[usr].name+"\r\n");
+                    users[usr].con->send(":"+servername+" 311 "+users[usr].nick+" "+message+" "+users[usr].color+users[usr].country+" "+users[usr].ip+" * :"+users[usr].name+"\r\n");
                 }
             }
             if( found == 0 ){
@@ -662,7 +662,13 @@ namespace ColdstormD{
                 c.notice("Insufficient parameters");
                 return ERROR_PARAM;
             }
-            return ERROR_NONE;
+            int rm = getroombyname( args[1] );
+            if( rm < 0 ){
+                c.notice("Invalid room");
+                return ERROR_NOTFOUND;
+            }
+
+            return rooms[rm].banlist(c.usr);
         }
         int help( connection& c, vector<String> args ){
             if( args.size() < 1 ){

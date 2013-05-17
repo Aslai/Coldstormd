@@ -453,9 +453,10 @@ namespace ColdstormD{
     int room::banlist(int usr){
         for( unsigned int i = 0; i < accesslist.size(); ++i ){
             if( (accesslist[i] & ACCESS_BANNED) ){
-                ColdstormD::users[usr].con->send("");
+                ColdstormD::users[usr].con->send(":"+servername+" 367 "+ColdstormD::users[usr].nick + " " + name + " " + ColdstormD::users[users[i]].nick + " a 0\r\n" );
             }
         }
+        ColdstormD::users[usr].con->send(":"+servername+" 368 "+ColdstormD::users[usr].nick + " " + name + " :End of channel ban list\r\n" );
         return ERROR_NONE;
     }
     int room::motdhistory(int usr){
