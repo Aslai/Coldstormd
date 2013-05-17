@@ -28,7 +28,9 @@ struct ajaxlistener;
     #include <signal.h>
     #define SOCKET int
     #define Sleep(a) usleep(a*1000)
-    #define closesocket(sock) ::close( sock )
+    #ifndef closesocket
+    #define closesocket(sock) {shutdown(sock,SHUT_RDWR); ::close( sock );}
+    #endif
     //#define SOCKADDR_IN sockaddr_in
 #endif
 #include<string>

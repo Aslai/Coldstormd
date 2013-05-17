@@ -85,7 +85,12 @@ namespace ColdstormD{
         return false;
     }
 
-    String timestamp(){
-        return "Time";
+    String timestamp(int offset){
+        time_t t = time(0) + offset;
+        char buf[200];
+        struct tm times;
+        gmtime_r( &t, &times);
+        strftime(buf, 200, "%a, %b %d, %Y - %H:%M", &times);
+        return buf;
     }
 }

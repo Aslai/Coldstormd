@@ -41,6 +41,7 @@ String request(String url){
     String snd =    "GET "+git+" HTTP/1.1\r\n"+
                     "Host: "+addr+"\r\n\r\n";
     SOCKET s = connectTCP( resolveAddr(addr.c_str()), port);
+    if( s <= -0 ) return "";
     sendstr( s, snd );
     String v = readsock( s );
     //v = readsock( s );
@@ -109,6 +110,7 @@ String getcountrycode(SOCKET sock){
     //TODO: Implement
     //http://www.geoplugin.net/json.gp?ip=dottedip
     String r =request( "http://www.geoplugin.net/json.gp?ip=" + getipstr(sock).split(":")[0] ).tolower();
+    printf("\n\nR: %s\n\n", r.c_str());
     int p = r.indexof("geoplugin_countryCode");
     if( p > 0 ){
         String a = r.substr(r.indexof(":\"", p)+2, 2);

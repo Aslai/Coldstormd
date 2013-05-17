@@ -13,5 +13,5 @@ namespace ColdstormD{
     int consumeguestpass( String pass );
     int validatechannelname(String name);
     int validateusername(String name);
-    String timestamp();
+    String timestamp(int offset=0);
 }

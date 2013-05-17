@@ -304,13 +304,13 @@ namespace ColdstormD{
             if( off[1] > '5' ) {
                 return ERROR_PARAM;
             }
-            hour = (off[1]-'0');
+            hour = (off[0]-'0');
             minute = 10*(off[1]-'0')+(off[2]-'0');
         }
-        minute += 60*hour;
-        minute *= 60;
-        timeoffset = minute * mode;
-        con->notice("You have successfully set your timezone to "+off);
+        printf("Minute: %i\tHour: %i\n", minute, hour);
+        timeoffset = (60*hour+minute) * mode;
+        printf("timeoffset %i\n", timeoffset);
+        con->notice("You have successfully set your timezone to "+I(mode*hour)+(minute<10?":0":":")+I(minute));
         return ERROR_NONE;
     }
 }

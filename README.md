@@ -7,8 +7,6 @@ Progress
 * General server things
  * Implement IP discovery and country lookup
  * Logging
- * Proper timestamp generation
- * Acquisition of local time zone
 * Implement oper global commands
  * SERVKICK [user]
  * SERVBAN [time]
@@ -40,7 +38,9 @@ Progress
  * WHOIS
  * MOTD memory
  * Offline messages
- * Alias the IRC MODE command to related CSd commands:
+ * Alias the IRC MODE command to related CSd commands
+ * Proper timestamp generation
+ * Acquisition of local time zone
 * Oper global commands
 * Moderator global commands
 * Channel level sop commands
