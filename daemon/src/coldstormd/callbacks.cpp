@@ -194,6 +194,11 @@ namespace ColdstormD{
 
         return ERROR_NONE;
     }
+    int queuecallback( connection& c, String msg ){
+        queued::push( &c, msg );
+        return ERROR_NONE;
+    }
+
 
     int onconnect(connection& c){
         return intro( c, "Auth" );
@@ -222,5 +227,34 @@ namespace ColdstormD{
 
     void onquit(void){
         writedb( "database.kdb" );
+    }
+    mutex queued::mut = mutex_create();
+    deque<queued> queued::list;
+    queued::queued(connection*cc, String mm){
+        c = cc;
+        msg = mm;
+    }
+    void queued::push(connection*cc, String mm){
+        mutex_lock( mut );
+        list.push_back(queued(cc,mm));
+        mutex_unlock( mut );
+    }
+    queued queued::pull(){
+
+        mutex_lock( mut );
+        queued ret = list.front();
+
+        list.pop_front();
+        mutex_unlock( mut );
+        return ret;
+    }
+    void queued::flush( int (*callback)( connection& c, String msg ) ){
+        mutex_lock(mut);
+        while(list.size() > 0){
+            queued t = list.front();
+            list.pop_front();
+            callback( *(t.c), t.msg );
+        }
+        mutex_unlock(mut);
     }
 }
